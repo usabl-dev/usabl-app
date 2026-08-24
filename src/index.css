@@ -51,3 +51,18 @@ body {
   padding: 1.5rem;
   max-width: 56rem;
 }
+
+.hero-action {
+  border: 1px solid var(--pf-t--global--border--color--brand);
+  border-radius: 4px;
+  background: var(--pf-t--global--background--color--secondary--default);
+  color: var(--pf-t--global--text--color--brand);
+  font: inherit;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+}
+
+.hero-action:hover {
+  background: var(--pf-t--global--background--color--brand--default);
+  color: var(--pf-t--global--text--color--on-brand);
+}
