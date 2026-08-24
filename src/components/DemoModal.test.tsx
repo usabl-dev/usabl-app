@@ -32,31 +32,31 @@ function Harness({ variant }: HarnessProps) {
 }
 
 describe('DemoModal focus return variants', () => {
-  it('broken variant does not return focus to trigger after close', async () => {
+  it('broken variant leaves focus on trigger when trap is disabled', async () => {
     const user = userEvent.setup()
     render(<Harness variant="broken" />)
 
     const trigger = screen.getByRole('button', { name: 'View cluster details' })
     await user.click(trigger)
-    const closeButtons = await screen.findAllByRole('button', { name: 'Close' })
-    await user.click(closeButtons[closeButtons.length - 1])
+    await screen.findByRole('dialog')
+    expect(document.activeElement).toBe(trigger)
+    await user.keyboard('{Escape}')
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
-    await waitFor(() => {
-      expect(document.activeElement).not.toBe(trigger)
-    })
+    expect(document.activeElement).toBe(trigger)
   })
 
-  it('fixed variant returns focus to trigger after close', async () => {
+  it('fixed variant traps focus then returns it after Escape close', async () => {
     const user = userEvent.setup()
     render(<Harness variant="fixed" />)
 
     const trigger = screen.getByRole('button', { name: 'View cluster details' })
     await user.click(trigger)
-    const closeButtons = await screen.findAllByRole('button', { name: 'Close' })
-    await user.click(closeButtons[closeButtons.length - 1])
+    await screen.findByRole('dialog')
+    expect(document.activeElement).not.toBe(trigger)
+    await user.keyboard('{Escape}')
 
     await waitFor(() => {
       expect(document.activeElement).toBe(trigger)

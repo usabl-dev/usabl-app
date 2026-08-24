@@ -1,6 +1,7 @@
 /**
  * Modal used to demonstrate focus-return behavior differences.
- * Only the fixed variant restores focus to the trigger, so the broken variant remains an intentional probe target.
+ * The broken variant disables the focus trap to plant a real WCAG 2.4.3 focus-order defect.
+ * Blurring after a correct restore would fabricate behavior that the browser and PatternFly did not produce.
  */
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@patternfly/react-core'
 import type { Variant } from '../lib/variant'
@@ -17,18 +18,17 @@ export function DemoModal({ isOpen, onRequestClose, triggerEl, variant }: DemoMo
     onRequestClose()
     if (variant === 'fixed') {
       triggerEl?.focus()
-      return
     }
-
-    // The broken variant intentionally fails to restore trigger focus.
-    // We explicitly blur after close so tests capture the planted defect reliably.
-    window.setTimeout(() => {
-      triggerEl?.blur()
-    }, 0)
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={closeModal} aria-labelledby="cluster-details-title" variant="medium">
+    <Modal
+      isOpen={isOpen}
+      onClose={closeModal}
+      aria-labelledby="cluster-details-title"
+      variant="medium"
+      disableFocusTrap={variant === 'broken'}
+    >
       <ModalHeader
         title="Cluster details"
         labelId="cluster-details-title"
