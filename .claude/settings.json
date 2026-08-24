@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ../usabl/dist/stop-hook-runner.js"
+          }
+        ]
+      }
+    ]
+  }
+}

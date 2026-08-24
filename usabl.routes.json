@@ -1,0 +1,5 @@
+{ "routes": [
+  { "screenId": "overview", "url": "/", "entryFile": "src/pages/Overview.tsx" },
+  { "screenId": "clusters", "url": "/clusters", "entryFile": "src/pages/Clusters.tsx" },
+  { "screenId": "settings", "url": "/settings", "entryFile": "src/pages/Settings.tsx" }
+]}

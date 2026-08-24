@@ -1,0 +1,14 @@
+{
+  "appBaseUrl": "http://127.0.0.1:5173",
+  "uiFileGlobs": ["src/**"],
+  "discovery": {
+    "routerFile": "src/App.tsx",
+    "wideBlastGlobs": ["src/App.tsx", "src/main.tsx", "src/**/*.css", "index.html", "vite.config.ts"]
+  },
+  "surfaces": [
+    { "id": "overview", "url": "http://127.0.0.1:5173/", "files": ["src/pages/Overview.tsx"] },
+    { "id": "clusters", "url": "http://127.0.0.1:5173/clusters", "files": ["src/pages/Clusters.tsx"] },
+    { "id": "settings", "url": "http://127.0.0.1:5173/settings", "files": ["src/pages/Settings.tsx"] }
+  ],
+  "guardedPaths": ["usabl.config.json", "usabl.routes.json", ".usabl-evidence.json", ".usabl-waivers.json"]
+}
