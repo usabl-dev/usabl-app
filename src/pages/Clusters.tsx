@@ -5,7 +5,6 @@
 import { useRef, useState } from 'react'
 import { Card, CardBody, CardTitle } from '@patternfly/react-core'
 import { DemoModal } from '../components/DemoModal'
-import { StatusBadge } from '../components/StatusBadge'
 import { readVariant } from '../lib/variant'
 
 export function Clusters() {
@@ -18,9 +17,7 @@ export function Clusters() {
       <CardTitle>Clusters</CardTitle>
       <CardBody>
         <p>Current environment: Production East.</p>
-        <p>
-          Upgrade risk: <StatusBadge text="Attention required" tone="attention" />
-        </p>
+        <p>Upgrade risk: Attention required.</p>
         <p>
           <button
             ref={triggerEl}

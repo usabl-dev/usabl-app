@@ -4,6 +4,7 @@
  * Blurring after a correct restore would fabricate behavior that the browser and PatternFly did not produce.
  */
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@patternfly/react-core'
+import { useLayoutEffect, useRef } from 'react'
 import type { Variant } from '../lib/variant'
 
 interface DemoModalProps {
@@ -14,6 +15,14 @@ interface DemoModalProps {
 }
 
 export function DemoModal({ isOpen, onRequestClose, triggerEl, variant }: DemoModalProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  useLayoutEffect(() => {
+    if (isOpen && variant === 'fixed') {
+      closeButtonRef.current?.focus()
+    }
+  }, [isOpen, variant])
+
   const closeModal = () => {
     onRequestClose()
     if (variant === 'fixed') {
@@ -28,6 +37,7 @@ export function DemoModal({ isOpen, onRequestClose, triggerEl, variant }: DemoMo
       aria-labelledby="cluster-details-title"
       variant="medium"
       disableFocusTrap={variant === 'broken'}
+      elementToFocus={variant === 'fixed' ? '#cluster-details-close' : undefined}
     >
       <ModalHeader
         title="Cluster details"
@@ -39,7 +49,7 @@ export function DemoModal({ isOpen, onRequestClose, triggerEl, variant }: DemoMo
         <p>Storage warning threshold has not been crossed.</p>
       </ModalBody>
       <ModalFooter>
-        <Button variant="primary" onClick={closeModal}>
+        <Button id="cluster-details-close" ref={closeButtonRef} variant="primary" onClick={closeModal}>
           Close
         </Button>
       </ModalFooter>
