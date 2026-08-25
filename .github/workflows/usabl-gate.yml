@@ -57,6 +57,12 @@ jobs:
           ln -sfn "$GITHUB_WORKSPACE/.usabl-engine" "$GITHUB_WORKSPACE/../usabl"
           npm ci
 
+      - name: Rebuild trusted engine after fixture install
+        working-directory: .usabl-engine
+        run: |
+          # Fixture lifecycle scripts are PR-controlled; rebuild restores dist/cli.js from the pinned v0.1.0 tree.
+          npm run build
+
       - name: Start fixture on localhost
         run: |
           npm run dev -- --host 127.0.0.1 --port 5173 > /tmp/usabl-vite.log 2>&1 &
