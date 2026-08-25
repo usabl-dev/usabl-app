@@ -1,32 +1,82 @@
-# React + TypeScript + Vite
+# usabl-app
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+`usabl-app` is the PatternFly 6 fixture used by the usabl team preview.
 
-Currently, two official plugins are available:
+## Access and sibling layout
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Both repositories are private:
 
-## React Compiler
+- [usabl](https://github.com/usabl-dev/usabl)
+- [usabl-app](https://github.com/usabl-dev/usabl-app)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Ask a maintainer for access, then clone them as siblings:
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```text
+<workspace>/
+  usabl/
+  usabl-app/
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+This fixture links the local engine through a file dependency (`file:../usabl`).
+
+## Prerequisites
+
+- Node.js 22
+- npm
+
+Build the sibling engine first so `../usabl/dist` exists:
+
+```bash
+cd ../usabl
+npm run build
+```
+
+Then install in this repo:
+
+```bash
+cd ../usabl-app
+npm install
+```
+
+## Run the fixture
+
+Start dev mode:
+
+```bash
+npm run dev
+```
+
+Open `http://127.0.0.1:5173`, go to `/clusters`, select **View cluster details**, then press `Escape`.
+Current behavior on the broken path is that focus is lost.
+
+## Run an engine check
+
+From the `usabl-app` working directory:
+
+```bash
+npx usabl check
+```
+
+Until the modal is fixed in code, expect a `regression` verdict with `pf-modal-focus-return`.
+Do not treat query-string variants as the team ratchet. Fix the modal behavior in code.
+
+## Overlay behavior
+
+The overlay badge is advisory only. It does not mint verdicts.
+Use `?usabl=off` to hide the badge.
+
+The stop hook runner is already configured in `.claude/settings.json`:
+
+```text
+node ../usabl/dist/stop-hook-runner.js
+```
+
+## Runbook and feedback
+
+- Engine runbook (local): `../usabl/docs/team-preview.md`
+- Engine runbook (GitHub): [usabl docs/team-preview.md](https://github.com/usabl-dev/usabl/blob/main/docs/team-preview.md)
+- Feedback template: [open a usabl feedback issue](https://github.com/usabl-dev/usabl/issues/new?template=feedback.yml)
+
+## CI status
+
+CI gate wiring is next and is not part of this change.

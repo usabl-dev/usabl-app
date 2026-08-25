@@ -1,7 +1,7 @@
 {
   "name": "usabl-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -29,6 +29,7 @@
     "jsdom": "30.0.1",
     "oxlint": "^1.75.0",
     "typescript": "~6.0.2",
+    "usabl": "file:../usabl",
     "vite": "^8.2.0",
     "vitest": "4.1.11"
   }
