@@ -51,9 +51,11 @@ jobs:
 
       - name: Snapshot trusted engine for gate execution
         run: |
-          # Keep a trusted CLI copy in RUNNER_TEMP, outside PR workspace write paths.
-          # Fixture install steps must not be able to replace the gate binary.
-          cp -a "$GITHUB_WORKSPACE/.usabl-engine" "$RUNNER_TEMP/usabl-trusted"
+          # Root-owned copy so same-user RUNNER_TEMP and dev scripts cannot overwrite the gate CLI.
+          sudo cp -a "$GITHUB_WORKSPACE/.usabl-engine" /opt/usabl-trusted
+          sudo chown -R root:root /opt/usabl-trusted
+          sudo chmod -R a-w /opt/usabl-trusted
+          sudo chmod -R a+rX /opt/usabl-trusted
 
       - name: Install fixture dependencies for CI
         run: |
@@ -92,7 +94,7 @@ jobs:
           code=0
           # Keep || code=$? on the same line, because a next-line $? becomes 0 under set -e.
           # trusted-ref points to origin/${BASE_REF} so a PR cannot rewrite policy and pass itself.
-          node "$RUNNER_TEMP/usabl-trusted/dist/cli.js" check --ci --trusted-ref "origin/${BASE_REF}" --json > usabl-result.json || code=$?
+          node /opt/usabl-trusted/dist/cli.js check --ci --trusted-ref "origin/${BASE_REF}" --json > usabl-result.json || code=$?
           echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
 
       - name: Stop fixture server
@@ -103,7 +105,7 @@ jobs:
           fi
 
       - name: Render comment Markdown
-        run: node "$RUNNER_TEMP/usabl-trusted/dist/cli.js" comment < usabl-result.json > usabl-comment.md
+        run: node /opt/usabl-trusted/dist/cli.js comment < usabl-result.json > usabl-comment.md
 
       - name: Fallback when comment markdown is empty
         run: |
