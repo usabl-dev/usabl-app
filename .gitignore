@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .usabl/
+.usabl-engine/
 storageState*.json
 **/storageState*.json
 

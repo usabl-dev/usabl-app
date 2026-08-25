@@ -77,6 +77,12 @@ node ../usabl/dist/stop-hook-runner.js
 - Engine runbook (GitHub): [usabl docs/team-preview.md](https://github.com/usabl-dev/usabl/blob/main/docs/team-preview.md)
 - Feedback template: [open a usabl feedback issue](https://github.com/usabl-dev/usabl/issues/new?template=feedback.yml)
 
-## CI status
+## CI gate
 
-CI gate wiring is next and is not part of this change.
+PRs to `main` run `usabl check --ci --trusted-ref` and the gate verdict is the source of truth.
+
+The workflow checks out the trusted engine tag `v0.1.0` into gitignored `.usabl-engine/` before running checks.
+
+The repo secret `USABL_ENGINE_CHECKOUT_TOKEN` must exist with read-only access to `usabl-dev/usabl`. Founder creates the secret in repository settings. Do not put token values in workflow YAML or docs.
+
+Until the modal is fixed in code, PRs that touch UI are expected to return `regression`. Docs-only PRs can be `idle`.
