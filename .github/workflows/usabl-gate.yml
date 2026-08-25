@@ -22,7 +22,6 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
-          persist-credentials: false
 
       - name: Checkout trusted usabl engine tag
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -52,9 +51,11 @@ jobs:
 
       - name: Install fixture dependencies for CI
         run: |
-          # package.json pins usabl as file:../usabl, but GitHub Actions does not have that sibling checkout.
-          # Install the checked out engine package without changing committed manifests so vite.config.ts can resolve usabl/vite.
-          npm install --no-save ./.usabl-engine
+          # The fixture lockfile pins usabl as file:../usabl.
+          # On Actions there is no sibling checkout by default, so create that sibling path as a symlink to .usabl-engine.
+          # This lets npm ci honor the committed lockfile and install the same dependency graph Vite expects.
+          ln -sfn "$GITHUB_WORKSPACE/.usabl-engine" "$GITHUB_WORKSPACE/../usabl"
+          npm ci
 
       - name: Start fixture on localhost
         run: |
