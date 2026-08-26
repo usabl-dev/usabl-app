@@ -18,5 +18,5 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ text, tone }: StatusBadgeProps) {
-  return <Label color={toneToColor[tone]}>{text}</Label>
+  return <Label className="status-badge" color={toneToColor[tone]}>{text}</Label>
 }

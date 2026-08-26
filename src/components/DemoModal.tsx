@@ -4,17 +4,17 @@
  * Blurring after a correct restore would fabricate behavior that the browser and PatternFly did not produce.
  */
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@patternfly/react-core'
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, type RefObject } from 'react'
 import type { Variant } from '../lib/variant'
 
 interface DemoModalProps {
   isOpen: boolean
   onRequestClose: () => void
-  triggerEl: HTMLButtonElement | null
+  triggerRef: RefObject<HTMLButtonElement | null>
   variant: Variant
 }
 
-export function DemoModal({ isOpen, onRequestClose, triggerEl, variant }: DemoModalProps) {
+export function DemoModal({ isOpen, onRequestClose, triggerRef, variant }: DemoModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   useLayoutEffect(() => {
@@ -26,7 +26,7 @@ export function DemoModal({ isOpen, onRequestClose, triggerEl, variant }: DemoMo
   const closeModal = () => {
     onRequestClose()
     if (variant === 'fixed') {
-      triggerEl?.focus()
+      triggerRef.current?.focus()
     }
   }
 

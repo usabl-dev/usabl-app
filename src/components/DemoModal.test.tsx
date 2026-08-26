@@ -24,7 +24,7 @@ function Harness({ variant }: HarnessProps) {
       <DemoModal
         isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
-        triggerEl={triggerEl.current}
+        triggerRef={triggerEl}
         variant={variant}
       />
     </>
