@@ -46,7 +46,7 @@ export function Deployments() {
           <table className="data-table">
             <thead><tr><th scope="col">Deployment</th><th scope="col">Version</th><th scope="col">Cluster</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
             <tbody>{filteredDeployments.map((deployment) => (
-              <tr key={deployment.name}><th scope="row">{deployment.name}</th><td className="mono-value">{deployment.version}</td><td>{deployment.cluster}</td><td><StatusBadge text={deployment.status} tone={deployment.tone} /></td><td><Link className="table-action" to="/clusters?scenario=cluster-dialog&preview=current">View {deployment.name}</Link></td></tr>
+              <tr key={deployment.name}><th scope="row">{deployment.name}</th><td className="mono-value">{deployment.version}</td><td>{deployment.cluster}</td><td><StatusBadge text={deployment.status} tone={deployment.tone} /></td><td><Link className="table-action" to="/clusters?scenario=cluster-dialog&preview=current" aria-label={`View ${deployment.name} details`}>View details</Link></td></tr>
             ))}{filteredDeployments.length === 0 ? <tr><td colSpan={5}>No deployments match these filters.</td></tr> : null}</tbody>
           </table>
         </div>

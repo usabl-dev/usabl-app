@@ -385,9 +385,29 @@ select,
 }
 
 .status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.35;
+}
+
+.status-badge--healthy {
+  background: #d9f2d0;
+  color: #1e4f18;
+}
+
+.status-badge--warning {
+  background: #fff1c9;
+  color: #5f3a00;
+}
+
+.status-badge--attention {
+  background: #fbc5c5;
+  color: #6a0606;
 }
 
 .scenario-focus {
@@ -451,7 +471,7 @@ select,
 
 .data-table {
   width: 100%;
-  min-width: 48rem;
+  min-width: 40rem;
   border-collapse: collapse;
   font-size: 1rem;
 }
