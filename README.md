@@ -4,7 +4,7 @@
 
 ## Access and sibling layout
 
-Both repositories are private:
+For now, until usabl is published as an npm package, both repositories are private and you clone them next to each other:
 
 - [usabl](https://github.com/usabl-dev/usabl)
 - [usabl-app](https://github.com/usabl-dev/usabl-app)
@@ -17,14 +17,16 @@ Ask a maintainer for access, then clone them as siblings:
   usabl-app/
 ```
 
-This fixture links the local engine through a file dependency (`file:../usabl`).
+This fixture depends on `"usabl": "file:../usabl"`.
+
+Later, this will be `npm install usabl` like any other package. You will not need the usabl repo on disk unless you are changing usabl itself.
 
 ## Prerequisites
 
 - Node.js 22
 - npm
 
-Build the sibling engine first so `../usabl/dist` exists:
+For now, build the sibling usabl first so `../usabl/dist` exists:
 
 ```bash
 cd ../usabl
@@ -62,14 +64,16 @@ Do not treat query-string variants as the team ratchet. Fix the modal behavior i
 
 ## Overlay behavior
 
-The overlay badge is advisory only. It does not mint verdicts.
+The overlay badge is a hint. It does not fail the build.
 Use `?usabl=off` to hide the badge.
 
-The stop hook runner is already configured in `.claude/settings.json`:
+For now, the stop hook in `.claude/settings.json` points at the folder next door:
 
 ```text
 node ../usabl/dist/stop-hook-runner.js
 ```
+
+Later the hook will come from the installed package.
 
 ## Runbook and feedback
 
@@ -79,10 +83,10 @@ node ../usabl/dist/stop-hook-runner.js
 
 ## CI gate
 
-PRs to `main` run `usabl check --ci --trusted-ref` and the gate verdict is the source of truth.
+PRs to `main` run `usabl check --ci --trusted-ref`. That answer is the one that counts.
 
-The workflow checks out the trusted engine tag `v0.1.0` into gitignored `.usabl-engine/` before running checks.
+For now, until usabl is an npm package, the job clones `usabl-dev/usabl` at tag `v0.1.0` into gitignored `.usabl-engine/`, builds it, and copies it to `/opt` so the pull request cannot replace the checker. That clone needs the repo secret `USABL_ENGINE_CHECKOUT_TOKEN` (read-only access to `usabl-dev/usabl`). Founder creates the secret in repository settings. Do not put token values in workflow YAML or docs.
 
-The repo secret `USABL_ENGINE_CHECKOUT_TOKEN` must exist with read-only access to `usabl-dev/usabl`. Founder creates the secret in repository settings. Do not put token values in workflow YAML or docs.
+Later, CI will `npm install usabl@0.1.0` from the registry. No extra git clone. No PAT. The check will still run from a copy the PR cannot overwrite, and still use `--ci --trusted-ref`.
 
 Until the modal is fixed in code, PRs that touch UI are expected to return `regression`. Docs-only PRs can be `idle`.
