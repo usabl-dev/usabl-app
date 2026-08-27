@@ -8,7 +8,7 @@ async function rootFile(path: string): Promise<string> {
 describe('team demo wiring', () => {
   it('pins CI to the merged accessibility inspector engine', async () => {
     const workflow = await rootFile('.github/workflows/usabl-gate.yml')
-    expect(workflow).toContain('ref: 49bf2d9f70cbd60db4657345e49075055cc8a66c')
+    expect(workflow).toContain('ref: 74239ee0fe4d0db4d3b600e0ab794f9883ba1542')
     expect(workflow).toContain('npx playwright install --with-deps chromium')
     expect(workflow).toContain('check --ci --trusted-ref')
   })
