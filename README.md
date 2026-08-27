@@ -1,6 +1,6 @@
 # usabl team demo
 
-This is the working fixture for the usabl v0.1.0 team demo. It uses a realistic
+This is the working fixture for the usabl v0.2.0 team demo. It uses a realistic
 PatternFly operations workflow to show accessibility barriers, one usabl Result,
 and the same Result across the browser inspector, Claude, and pull request checks.
 
@@ -309,7 +309,9 @@ npm run build
 npm audit --omit=dev
 ```
 
-The app and engine remain at version `0.1.0` during this hardening pass.
+The fixture is version `0.2.0`. CI pins the engine to the frozen core commit.
+Local installs still use `"usabl": "file:../usabl"` until `usabl@0.2.0` is
+published.
 
 ## Real application validation
 

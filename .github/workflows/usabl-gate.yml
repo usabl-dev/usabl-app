@@ -25,11 +25,11 @@ jobs:
 
       - name: Checkout trusted usabl engine commit
         # For now: usabl is not a published package, so clone the private repo.
-        # Later: npm install usabl@0.1.0 from the registry. Drop this checkout and the token.
+        # Later: npm install usabl@0.2.0 from the registry. Drop this checkout and the token.
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           repository: usabl-dev/usabl
-          ref: 74239ee0fe4d0db4d3b600e0ab794f9883ba1542
+          ref: e4a199fc65a6a3c88af6b8d0b52732d3d1b9f160
           path: .usabl-engine
           token: ${{ secrets.USABL_ENGINE_CHECKOUT_TOKEN }}
           persist-credentials: false
