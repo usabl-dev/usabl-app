@@ -5,8 +5,8 @@ PatternFly operations workflow to show accessibility barriers, one usabl Result,
 and the same Result across the browser inspector, Claude, and pull request checks.
 
 Start with the
-[team orientation](https://github.com/usabl-dev/usabl/blob/main/docs/team-orientation.html)
-and [How usabl works](https://github.com/usabl-dev/usabl/blob/main/docs/how-usabl-works.html).
+[team orientation](https://usabl-dev.github.io/usabl/team-orientation.html)
+and [How usabl works](https://usabl-dev.github.io/usabl/how-usabl-works.html).
 Then use this page for the live walkthrough.
 
 Allow 20 minutes for the first run. You do not need to write code to operate the
