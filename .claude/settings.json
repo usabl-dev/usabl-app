@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ../usabl/dist/stop-hook-runner.js"
+            "command": "node node_modules/usabl/dist/stop-hook-runner.js"
           }
         ]
       }
