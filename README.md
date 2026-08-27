@@ -85,7 +85,7 @@ Later the hook will come from the installed package.
 
 PRs to `main` run `usabl check --ci --trusted-ref`. That answer is the one that counts.
 
-For now, until usabl is an npm package, the job clones `usabl-dev/usabl` at tag `v0.1.0` into gitignored `.usabl-engine/`, builds it, and copies it to `/opt` so the pull request cannot replace the checker. That clone needs the repo secret `USABL_ENGINE_CHECKOUT_TOKEN` (read-only access to `usabl-dev/usabl`). Founder creates the secret in repository settings. Do not put token values in workflow YAML or docs.
+For now, until usabl is an npm package, the job clones `usabl-dev/usabl` at an approved, immutable v0.1.0 commit into gitignored `.usabl-engine/`. It builds the engine and copies it to `/opt` so the pull request cannot replace the checker. That clone needs the repo secret `USABL_ENGINE_CHECKOUT_TOKEN` with read-only access to `usabl-dev/usabl`. Create the secret in repository settings. Do not put token values in workflow YAML or docs.
 
 Later, CI will `npm install usabl@0.1.0` from the registry. No extra git clone. No PAT. The check will still run from a copy the PR cannot overwrite, and still use `--ci --trusted-ref`.
 
