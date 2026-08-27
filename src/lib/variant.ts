@@ -5,5 +5,6 @@
 export type Variant = 'broken' | 'fixed'
 
 export function readVariant(): Variant {
-  return new URLSearchParams(window.location.search).get('variant') === 'fixed' ? 'fixed' : 'broken'
+  const params = new URLSearchParams(window.location.search)
+  return params.get('variant') === 'fixed' || params.get('preview') === 'repaired' ? 'fixed' : 'broken'
 }

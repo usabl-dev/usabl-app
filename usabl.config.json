@@ -1,14 +1,25 @@
 {
   "appBaseUrl": "http://127.0.0.1:5173",
-  "uiFileGlobs": ["src/**"],
+  "uiFileGlobs": [
+    "src/App.tsx",
+    "src/index.css",
+    "src/pages/*.tsx",
+    "src/components/DemoControls.tsx",
+    "src/components/DemoModal.tsx",
+    "src/components/PageHeader.tsx",
+    "src/components/StatusBadge.tsx",
+    "src/demo/scenarios.ts",
+    "src/lib/variant.ts"
+  ],
   "discovery": {
     "routerFile": "src/App.tsx",
     "wideBlastGlobs": ["src/App.tsx", "src/main.tsx", "src/**/*.css", "index.html", "vite.config.ts"]
   },
   "surfaces": [
-    { "id": "overview", "url": "http://127.0.0.1:5173/", "files": ["src/pages/Overview.tsx"] },
-    { "id": "clusters", "url": "http://127.0.0.1:5173/clusters", "files": ["src/pages/Clusters.tsx"] },
-    { "id": "settings", "url": "http://127.0.0.1:5173/settings", "files": ["src/pages/Settings.tsx"] }
+    { "id": "overview", "url": "http://127.0.0.1:5173/", "files": ["src/App.tsx", "src/index.css", "src/pages/Overview.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts"] },
+    { "id": "deployments", "url": "http://127.0.0.1:5173/deployments", "files": ["src/App.tsx", "src/index.css", "src/pages/Deployments.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts"] },
+    { "id": "clusters", "url": "http://127.0.0.1:5173/clusters", "files": ["src/App.tsx", "src/index.css", "src/pages/Clusters.tsx", "src/components/DemoControls.tsx", "src/components/DemoModal.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts", "src/lib/variant.ts"] },
+    { "id": "settings", "url": "http://127.0.0.1:5173/settings", "files": ["src/App.tsx", "src/index.css", "src/pages/Settings.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/demo/scenarios.ts"] }
   ],
   "guardedPaths": ["usabl.config.json", "usabl.routes.json", ".usabl-evidence.json", ".usabl-waivers.json"]
 }
