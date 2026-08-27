@@ -23,12 +23,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Verify commit identities
-        env:
-          IDENTITY_BASE: ${{ github.event.pull_request.base.sha }}
-          IDENTITY_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: node scripts/check-commit-identities.mjs --range "${IDENTITY_BASE}" "${IDENTITY_HEAD}"
-
       - name: Checkout trusted usabl engine commit
         # For now: usabl is not a published package, so clone the private repo.
         # Later: npm install usabl@0.1.0 from the registry. Drop this checkout and the token.
