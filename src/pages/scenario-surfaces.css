@@ -1,0 +1,83 @@
+.deployment-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.icon-action {
+  width: 2.75rem;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--pf-t--global--border--color--control--default);
+  border-radius: 0.25rem;
+  background: var(--shell-surface);
+  color: var(--shell-ink);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.notification-region:empty {
+  display: none;
+}
+
+.deployment-alert {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--pf-t--global--color--status--success--default);
+  background: var(--pf-t--global--color--status--success--default);
+  color: var(--pf-t--global--text--color--on-brand);
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.table-action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.action-menu {
+  position: relative;
+}
+
+.action-menu__list {
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-2));
+  inset-inline-end: 0;
+  z-index: 10;
+  min-width: 13rem;
+  margin: 0;
+  padding: var(--space-1) 0;
+  border: 1px solid var(--shell-border);
+  border-radius: 0.25rem;
+  background: var(--shell-surface);
+  box-shadow: 0 0.25rem 0.5rem rgb(0 0 0 / 20%);
+  list-style: none;
+}
+
+.action-menu__list button {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--shell-ink);
+  text-align: start;
+  cursor: pointer;
+}
+
+.action-menu__list button:hover,
+.action-menu__list button:focus-visible {
+  background: var(--pf-t--global--background--color--action--plain--hover);
+}

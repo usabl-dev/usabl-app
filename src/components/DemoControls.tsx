@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { buildDemoSearch, DEMO_SCENARIOS, readDemoState, scenarioById, type DemoScenarioId, type PreviewMode } from '../demo/scenarios'
+import { CURRENT_SOURCE_LABEL, CURRENT_SOURCE_MODE } from '../demo/scenarios'
 
 const previewOptions: ReadonlyArray<{ value: PreviewMode; label: string }> = [
   { value: 'current', label: 'Current source' },
@@ -44,6 +45,7 @@ export function DemoControls() {
         <strong>{scenario.label}</strong>
         <p>{scenario.description}</p>
       </div>
+      <p className="demo-controls__source"><strong>Tracked source:</strong> {CURRENT_SOURCE_MODE} ({CURRENT_SOURCE_LABEL})</p>
       <p className="demo-controls__boundary">Preview controls support rehearsal. Usabl verifies source changes, not this preview.</p>
       <button type="button" className="text-action" onClick={() => navigate('/settings?scenario=deployment-workflow&preview=current')}>
         Open clean control

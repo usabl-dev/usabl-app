@@ -1,3 +1,4 @@
+import { CURRENT_SOURCE_MODE } from '../demo/scenarios'
 import { readVariant } from './variant'
 
 describe('readVariant', () => {
@@ -11,9 +12,9 @@ describe('readVariant', () => {
     expect(readVariant()).toBe('fixed')
   })
 
-  it('keeps current and broken previews on the planted behavior', () => {
+  it('keeps current on the tracked source mode and preserves the broken preview', () => {
     window.history.replaceState({}, '', '/clusters?preview=current')
-    expect(readVariant()).toBe('broken')
+    expect(readVariant()).toBe(CURRENT_SOURCE_MODE === 'repaired' ? 'fixed' : 'broken')
     window.history.replaceState({}, '', '/clusters?preview=broken')
     expect(readVariant()).toBe('broken')
   })

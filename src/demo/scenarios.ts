@@ -1,3 +1,8 @@
+export type SourceMode = 'broken' | 'repaired'
+
+export const CURRENT_SOURCE_MODE: SourceMode = 'repaired'
+export const CURRENT_SOURCE_LABEL = 'baseline-repaired'
+
 export type DemoScenarioId =
   | 'deployment-workflow'
   | 'cluster-dialog'
@@ -45,4 +50,8 @@ export function readDemoState(search: string): DemoState {
 
 export function buildDemoSearch(state: DemoState): string {
   return `?${new URLSearchParams({ scenario: state.scenarioId, preview: state.preview }).toString()}`
+}
+
+export function resolvePreviewMode(preview: PreviewMode): SourceMode {
+  return preview === 'current' ? CURRENT_SOURCE_MODE : preview
 }

@@ -1,10 +1,16 @@
 /**
  * Variant selection for the modal hero defect.
- * Query-only switching keeps demo state changes instant with no rebuild or code edits.
+ * Current follows the tracked source state. Explicit previews remain teaching aids.
  */
+import { readDemoState, resolvePreviewMode } from '../demo/scenarios'
+
 export type Variant = 'broken' | 'fixed'
 
 export function readVariant(): Variant {
   const params = new URLSearchParams(window.location.search)
-  return params.get('variant') === 'fixed' || params.get('preview') === 'repaired' ? 'fixed' : 'broken'
+  const explicit = params.get('variant')
+  if (explicit === 'fixed' || explicit === 'broken') {
+    return explicit
+  }
+  return resolvePreviewMode(readDemoState(window.location.search).preview) === 'repaired' ? 'fixed' : 'broken'
 }
