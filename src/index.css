@@ -243,11 +243,13 @@ select,
 
 .demo-controls__selection strong,
 .demo-controls__selection p,
+.demo-controls__source,
 .demo-controls__boundary {
   font-size: 1rem;
 }
 
 .demo-controls__selection p,
+.demo-controls__source,
 .demo-controls__boundary {
   margin: var(--space-2) 0 0;
   line-height: 1.55;
@@ -603,12 +605,14 @@ select,
   .demo-controls__heading,
   .demo-controls__field,
   .demo-controls__selection,
+  .demo-controls__source,
   .demo-controls__boundary,
   .text-action {
     margin: 0;
   }
 
   .demo-controls__selection,
+  .demo-controls__source,
   .demo-controls__boundary,
   .text-action {
     grid-column: 1 / -1;
@@ -640,6 +644,7 @@ select,
   }
 
   .demo-controls__selection,
+  .demo-controls__source,
   .demo-controls__boundary,
   .text-action {
     grid-column: auto;

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { CURRENT_SOURCE_LABEL, CURRENT_SOURCE_MODE } from '../demo/scenarios'
 import { DemoControls } from './DemoControls'
 
 function LocationProbe() {
@@ -27,13 +28,16 @@ describe('DemoControls', () => {
     )
   })
 
-  it('states that preview selection is not source proof', () => {
+  it('shows tracked source state and separates previews from proof', () => {
     render(
       <MemoryRouter>
         <DemoControls />
       </MemoryRouter>,
     )
 
+    expect(screen.getByText(/Tracked source:/i).parentElement).toHaveTextContent(
+      CURRENT_SOURCE_MODE + ' (' + CURRENT_SOURCE_LABEL + ')',
+    )
     expect(screen.getByText(/usabl verifies source changes, not this preview/i)).toBeVisible()
   })
 })

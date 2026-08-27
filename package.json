@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "demo:break": "node scripts/set-demo-source.mjs broken",
+    "demo:repair": "node scripts/set-demo-source.mjs repaired",
+    "demo:status": "node scripts/set-demo-source.mjs status",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
