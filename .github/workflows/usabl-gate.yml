@@ -127,14 +127,21 @@ jobs:
           }
           NODE
 
-      - name: Render comment Markdown
-        run: node /opt/usabl-trusted/dist/cli.js comment < usabl-result.json > usabl-comment.md
-
-      - name: Fallback when comment markdown is empty
+      - name: Render and validate comment Markdown
+        env:
+          USABL_EXIT: ${{ steps.usabl.outputs.exit_code }}
         run: |
-          if [ ! -s usabl-comment.md ]; then
-            printf '%s\n%s\n' '<!-- usabl-report -->' 'NOT verified - comment renderer produced no markdown' > usabl-comment.md
+          code=0
+          node /opt/usabl-trusted/dist/cli.js comment < usabl-result.json > usabl-comment.md || code=$?
+          if [ "${code}" -ne "${USABL_EXIT}" ]; then
+            echo "comment renderer exit code does not match the Result exit code"
+            exit 1
           fi
+          if [ ! -s usabl-comment.md ]; then
+            echo "comment renderer produced no markdown"
+            exit 1
+          fi
+          node -e "const fs = require('node:fs'); const body = fs.readFileSync('usabl-comment.md', 'utf8'); if (!body.includes('<!-- usabl-report -->')) throw new Error('comment markdown has no usabl marker');"
 
       - name: Post sticky PR comment
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
