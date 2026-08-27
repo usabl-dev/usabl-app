@@ -11,7 +11,8 @@
     "demo:status": "node scripts/set-demo-source.mjs status",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run && npm run test:identity",
+    "test:identity": "node --test scripts/check-commit-identities.node-test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
