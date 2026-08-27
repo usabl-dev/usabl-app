@@ -48,8 +48,21 @@ Start dev mode:
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173`, go to `/clusters`, select **View cluster details**, then press `Escape`.
-Current behavior on the broken path is that focus is lost.
+Open `http://127.0.0.1:5173/deployments`.
+
+Use the **Demo controls** region to move through the planned accessibility
+scenarios. The controls support team rehearsal. They do not prove a source repair.
+
+To exercise the current dialog oracle:
+
+1. Select **Cluster details dialog**.
+2. Keep **Current source** or select **Broken teaching preview**.
+3. Select **View cluster details**.
+4. Notice that focus stays on the trigger instead of entering the dialog.
+5. Close the dialog with `Escape`.
+
+Select **Repaired teaching preview** to compare focus entry and return. Use
+`/settings` as the clean control route.
 
 ## Run an engine check
 
@@ -59,13 +72,25 @@ From the `usabl-app` working directory:
 npx usabl check
 ```
 
-Until the modal is fixed in code, expect a `regression` verdict with `pf-modal-focus-return`.
+Until the modal is fixed in code, expect a dialog focus regression.
 Do not treat query-string variants as the team ratchet. Fix the modal behavior in code.
 
 ## Overlay behavior
 
 The overlay badge is a hint. It does not fail the build.
 Use `?usabl=off` to hide the badge.
+
+The badge is hidden from webdriver sessions so usabl does not scan its own
+development surface.
+
+## Verify the fixture
+
+```bash
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
 
 For now, the stop hook in `.claude/settings.json` points at the folder next door:
 
