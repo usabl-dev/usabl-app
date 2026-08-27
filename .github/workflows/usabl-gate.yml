@@ -23,13 +23,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout trusted usabl engine tag
+      - name: Checkout trusted usabl engine commit
         # For now: usabl is not a published package, so clone the private repo.
         # Later: npm install usabl@0.1.0 from the registry. Drop this checkout and the token.
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           repository: usabl-dev/usabl
-          ref: v0.1.0
+          ref: 84800551db1d402229e72130b2d681deac8c9d09
           path: .usabl-engine
           token: ${{ secrets.USABL_ENGINE_CHECKOUT_TOKEN }}
           persist-credentials: false
@@ -106,6 +106,26 @@ jobs:
           if [ -n "${VITE_PID:-}" ]; then
             kill "${VITE_PID}" || true
           fi
+
+      - name: Validate Result JSON
+        env:
+          USABL_EXIT: ${{ steps.usabl.outputs.exit_code }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const result = JSON.parse(fs.readFileSync('usabl-result.json', 'utf8'));
+          const capturedExit = Number(process.env.USABL_EXIT);
+
+          if (result.schemaVersion !== 'usabl.result.v1') {
+            throw new Error('usabl produced an unsupported Result schema');
+          }
+          if (!Number.isInteger(result.exitCode)) {
+            throw new Error('usabl Result has no integer exit code');
+          }
+          if (!Number.isInteger(capturedExit) || result.exitCode !== capturedExit) {
+            throw new Error('usabl Result exit code does not match the process exit code');
+          }
+          NODE
 
       - name: Render comment Markdown
         run: node /opt/usabl-trusted/dist/cli.js comment < usabl-result.json > usabl-comment.md
