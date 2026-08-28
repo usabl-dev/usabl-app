@@ -6,7 +6,7 @@ async function rootFile(path: string): Promise<string> {
 }
 
 describe('team demo wiring', () => {
-  it('pins CI to the trusted engine and keeps policy enforce off the accessibility job', async () => {
+  it('pins CI to the trusted engine and splits accessibility from policy', async () => {
     const workflow = await rootFile('.github/workflows/usabl-gate.yml')
     const codeowners = await rootFile('.github/CODEOWNERS')
     expect(workflow).toContain('ref: caef8a469cb8def203d03809b33fc787420940fc')
@@ -15,8 +15,8 @@ describe('team demo wiring', () => {
     expect(workflow).toContain('usabl-policy:')
     expect(workflow).toContain('if: always()')
     expect(workflow).toContain('enforce policy --trusted-ref')
-    expect(workflow).toContain('exit "${USABL_EXIT}"')
-    expect(workflow).not.toContain('enforce accessibility')
+    expect(workflow).toContain('enforce accessibility')
+    expect(workflow).not.toContain('exit "${USABL_EXIT}"')
     expect(codeowners).toContain('@eparenti')
     expect(codeowners).toContain('usabl.config.json')
     expect(codeowners).toContain('.usabl-evidence.json')
