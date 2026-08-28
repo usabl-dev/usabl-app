@@ -5,6 +5,9 @@ on:
     branches: [main]
     # Retargeting onto main must re-run trusted-ref policy checks.
     types: [opened, synchronize, reopened, edited]
+  pull_request_review:
+    # Use the event payload so a review still knows the base branch and head SHA.
+    types: [submitted, edited, dismissed]
 
 permissions:
   contents: read
@@ -16,11 +19,12 @@ jobs:
       contents: read
       pull-requests: write
     env:
-      BASE_REF: ${{ github.base_ref }}
+      BASE_REF: ${{ github.event.pull_request.base.ref }}
     steps:
       - name: Checkout fixture repository
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Checkout trusted usabl engine commit
@@ -208,11 +212,12 @@ jobs:
       contents: read
       pull-requests: read
     env:
-      BASE_REF: ${{ github.base_ref }}
+      BASE_REF: ${{ github.event.pull_request.base.ref }}
     steps:
       - name: Checkout fixture repository
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Fetch trusted base ref when absent
