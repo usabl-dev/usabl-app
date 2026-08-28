@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           repository: usabl-dev/usabl
-          ref: e4a199fc65a6a3c88af6b8d0b52732d3d1b9f160
+          ref: caef8a469cb8def203d03809b33fc787420940fc
           path: .usabl-engine
           token: ${{ secrets.USABL_ENGINE_CHECKOUT_TOKEN }}
           persist-credentials: false
@@ -175,6 +175,15 @@ jobs:
               });
             }
 
+      - name: Upload Result JSON
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: usabl-result
+          path: usabl-result.json
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Enforce verdict (fail closed on missing exit code)
         env:
           USABL_EXIT: ${{ steps.usabl.outputs.exit_code }}
@@ -184,3 +193,58 @@ jobs:
             exit 1
           fi
           exit "${USABL_EXIT}"
+
+  usabl-policy:
+    # Cheap second check. Do not switch gate-comment to accessibility-only
+    # until this job is a required status, or policy PRs could merge unsigned.
+    needs: gate-comment
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      BASE_REF: ${{ github.base_ref }}
+    steps:
+      - name: Checkout fixture repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+
+      - name: Fetch trusted base ref when absent
+        run: |
+          if ! git rev-parse --verify --quiet "origin/${BASE_REF}" > /dev/null; then
+            git fetch origin "${BASE_REF}" --depth=1
+          fi
+
+      - name: Checkout trusted usabl engine commit
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: usabl-dev/usabl
+          ref: caef8a469cb8def203d03809b33fc787420940fc
+          path: .usabl-engine
+          token: ${{ secrets.USABL_ENGINE_CHECKOUT_TOKEN }}
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: .usabl-engine/package-lock.json
+
+      - name: Install and build trusted engine
+        working-directory: .usabl-engine
+        run: npm ci && npm run build
+
+      - name: Download Result JSON
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: usabl-result
+
+      - name: Enforce policy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Git refs and CODEOWNERS are the source of truth. Stdin Result cannot skip owners.
+          node .usabl-engine/dist/cli.js enforce policy --trusted-ref "origin/${BASE_REF}" < usabl-result.json

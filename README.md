@@ -309,9 +309,9 @@ npm run build
 npm audit --omit=dev
 ```
 
-The fixture is version `0.2.0`. CI pins the engine to the frozen core commit.
-Local installs still use `"usabl": "file:../usabl"` until `usabl@0.2.0` is
-published.
+The fixture is version `0.2.0`. CI pins the engine to the trusted commit in
+`.github/workflows/usabl-gate.yml`. Local installs still use
+`"usabl": "file:../usabl"` until `usabl@0.2.0` is published.
 
 ## Real application validation
 
