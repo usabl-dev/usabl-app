@@ -214,7 +214,7 @@ Open the pull request in GitHub.
 
 Expected result:
 
-- The `usabl-gate` check fails.
+- The `gate-comment` check fails on the accessibility exit.
 - A sticky usabl comment shows Regression and the same accessibility findings.
 - The comment and check come from an immutable trusted engine copy.
 - The failed check prevents a normal merge.
@@ -265,7 +265,7 @@ git push
 Expected pull request result:
 
 - The same sticky comment updates to Verified.
-- The required check passes.
+- The `gate-comment` and `usabl-policy` required checks pass.
 - The receipt describes the repaired head commit.
 
 Close the rehearsal pull request after the team session. Do not merge it into
@@ -278,8 +278,9 @@ main. This keeps `baseline-repaired` available for the next rehearsal.
 | Browser inspector | Dev server load and source refresh | No | Findings, coverage, repair guidance, receipt |
 | Claude `/usabl-check` | Operator invokes it during work | No | Advisory Result before Claude tries to finish |
 | Claude Stop hook | Claude tries to stop | Yes | Regression block, then verified allow |
-| Pull request comment | Trusted GitHub workflow runs | Yes, through its check | Sticky Result for the exact PR head |
-| CI check | Pull request changes mapped interface files | Yes | Exit code from trusted policy and engine |
+| Pull request comment | Trusted GitHub workflow runs | Yes, through its checks | Sticky Result for the exact PR head |
+| CI accessibility | Pull request changes mapped interface files | Yes | `accessibilityExitCode` from the trusted engine |
+| CI policy | Pull request changes guarded policy files | Yes | CODEOWNERS approval of the current head |
 
 Every surface uses the same Result model. The inspector and mid-session command do
 not mint a separate verdict.

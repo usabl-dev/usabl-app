@@ -125,6 +125,9 @@ jobs:
           if (!Number.isInteger(capturedExit) || result.exitCode !== capturedExit) {
             throw new Error('usabl Result exit code does not match the process exit code');
           }
+          if (result.accessibilityExitCode === 2) {
+            throw new Error('accessibilityExitCode cannot be 2');
+          }
           NODE
 
       - name: Render and validate comment Markdown
@@ -184,7 +187,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Enforce verdict (fail closed on missing exit code)
+      - name: Enforce accessibility
         env:
           USABL_EXIT: ${{ steps.usabl.outputs.exit_code }}
         run: |
@@ -192,11 +195,12 @@ jobs:
             echo "usabl produced no exit code; failing closed."
             exit 1
           fi
-          exit "${USABL_EXIT}"
+          # Never exit 2 here. Guarded-file approval lives on usabl-policy.
+          node /opt/usabl-trusted/dist/cli.js enforce accessibility < usabl-result.json
 
   usabl-policy:
-    # Cheap second check. Do not switch gate-comment to accessibility-only
-    # until this job is a required status, or policy PRs could merge unsigned.
+    # Required status. Accessibility never uses exit 2, so policy PRs merge
+    # only when this job is green after a qualifying CODEOWNERS approval.
     needs: gate-comment
     if: always()
     runs-on: ubuntu-latest
