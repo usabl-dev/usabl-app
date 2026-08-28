@@ -17,6 +17,7 @@ describe('team demo wiring', () => {
     expect(workflow).toContain('enforce policy --trusted-ref')
     expect(workflow).toContain('enforce accessibility')
     expect(workflow).toContain('pull_request_review:')
+    expect(workflow).toContain('submitted, edited, dismissed')
     expect(workflow).toContain('github.event.pull_request.base.ref')
     expect(workflow).toContain('github.event.pull_request.head.sha')
     expect(workflow).not.toContain('github.base_ref')

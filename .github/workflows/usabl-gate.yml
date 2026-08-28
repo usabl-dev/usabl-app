@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened, edited]
   pull_request_review:
     # Use the event payload so a review still knows the base branch and head SHA.
-    types: [submitted]
+    types: [submitted, edited, dismissed]
 
 permissions:
   contents: read
