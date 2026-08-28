@@ -6,11 +6,21 @@ async function rootFile(path: string): Promise<string> {
 }
 
 describe('team demo wiring', () => {
-  it('pins CI to the frozen v0.2.0 engine', async () => {
+  it('pins CI to the trusted engine and keeps policy enforce off the accessibility job', async () => {
     const workflow = await rootFile('.github/workflows/usabl-gate.yml')
-    expect(workflow).toContain('ref: e4a199fc65a6a3c88af6b8d0b52732d3d1b9f160')
+    const codeowners = await rootFile('.github/CODEOWNERS')
+    expect(workflow).toContain('ref: caef8a469cb8def203d03809b33fc787420940fc')
     expect(workflow).toContain('npx playwright install --with-deps chromium')
     expect(workflow).toContain('check --ci --trusted-ref')
+    expect(workflow).toContain('usabl-policy:')
+    expect(workflow).toContain('if: always()')
+    expect(workflow).toContain('enforce policy --trusted-ref')
+    expect(workflow).toContain('exit "${USABL_EXIT}"')
+    expect(workflow).not.toContain('enforce accessibility')
+    expect(codeowners).toContain('@eparenti')
+    expect(codeowners).toContain('usabl.config.json')
+    expect(codeowners).toContain('.usabl-evidence.json')
+    expect(codeowners).not.toContain('@usabl-dev')
   })
 
   it('keeps the Claude mid-session check advisory and the installed Stop hook gating', async () => {
