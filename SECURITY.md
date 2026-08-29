@@ -53,22 +53,23 @@ bypass:
 - The pull request author's own approval never counts. A guarded change needs a
   second owner, so no single person can push policy changes past the gate.
 
-## Making the gate binding with branch protection
+## Branch protection is enforced
 
-The workflow reports status, but GitHub only blocks a merge when branch
-protection requires it. To make the gate enforcing on `main`:
+A repository ruleset named "Protect main" makes the gate binding on `main`. It is
+active and lists no bypass actors, so it applies to everyone, including
+administrators. The ruleset requires:
 
-1. Enable branch protection on `main`.
-2. Require these status checks to pass before merging:
-   - `gate-comment` (the accessibility scan)
-   - `usabl-policy` (the guarded-path and approval check)
-3. Require a pull request before merging, and require review from Code Owners.
-4. Do not allow force pushes or branch deletion.
-5. Include administrators, so the gate applies to everyone.
+1. The `gate-comment` (accessibility scan) and `usabl-policy` (guarded-path and
+   approval) status checks to pass before merging, with the strict setting so a
+   branch must be up to date with `main` first.
+2. A pull request before any change to `main`.
+3. No force pushes and no branch deletion.
 
-Until branch protection is enabled the checks are advisory: they run and report,
-but a red check does not block a merge. Enabling branch protection is the step
-that turns the reported verdict into an enforced one.
+Guarded-path approval is enforced by the `usabl-policy` check, not by GitHub's
+native code-owner review, so the ruleset itself sets no required review count.
+usabl-policy reads CODEOWNERS from the trusted base ref and requires an owner
+approval on the current head that is not the pull request author. A red check
+blocks the merge, so the reported verdict is enforced, not advisory.
 
 ## Reporting
 
