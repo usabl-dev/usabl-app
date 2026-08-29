@@ -3,3 +3,8 @@ usabl.config.json @eparenti
 usabl.routes.json @eparenti
 .usabl-evidence.json @eparenti
 .usabl-waivers.json @eparenti
+
+# The gate protects itself. The workflow decides the merge and CODEOWNERS decides
+# who can approve policy changes, so a PR that edits either needs an owner review.
+.github/workflows/* @eparenti
+.github/CODEOWNERS @eparenti

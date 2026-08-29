@@ -64,6 +64,20 @@ describe('team demo wiring', () => {
     expect(policy).toContain('pull/')
   })
 
+  it('guards the gate workflow and ownership map so neither changes without a second owner review', async () => {
+    const config = JSON.parse(await rootFile('usabl.config.json')) as { guardedPaths: string[] }
+    const codeowners = await rootFile('.github/CODEOWNERS')
+
+    // The gate workflow decides the merge, and CODEOWNERS decides who can approve
+    // policy changes. A PR that edits either must require a CODEOWNERS review, so
+    // both are guarded paths with a matching owner rule. The workflow directory is
+    // guarded as a prefix so a newly added workflow file is caught too.
+    expect(config.guardedPaths).toContain('.github/workflows')
+    expect(config.guardedPaths).toContain('.github/CODEOWNERS')
+    expect(codeowners).toContain('.github/workflows/* @eparenti')
+    expect(codeowners).toContain('.github/CODEOWNERS @eparenti')
+  })
+
   it('keeps the Claude mid-session check advisory and the installed Stop hook gating', async () => {
     const settings = await rootFile('.claude/settings.json')
     const skill = await rootFile('.claude/skills/usabl-check/SKILL.md')
