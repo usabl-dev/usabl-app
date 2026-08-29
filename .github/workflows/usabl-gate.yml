@@ -14,6 +14,10 @@ permissions:
 
 jobs:
   gate-comment:
+    # The scan starts the fixture, and npm run dev executes PR head code. Only a
+    # pull_request event denies secrets to fork head code, so fence the scan to it.
+    # A pull_request_review event carries base-repo secrets and must never run head code.
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -203,28 +207,44 @@ jobs:
           node /opt/usabl-trusted/dist/cli.js enforce accessibility < usabl-result.json
 
   usabl-policy:
-    # Required status. Accessibility never uses exit 2, so policy PRs merge
-    # only when this job is green after a qualifying CODEOWNERS approval.
+    # Required status. It re-runs on pull_request_review so a CODEOWNERS approval or
+    # dismissal flips the gate. Review events carry base-repo secrets, so this job
+    # must never check out or execute PR head code. It reads the head only as git
+    # objects and decides from the trusted base ref, CODEOWNERS, and the reviews API.
     needs: gate-comment
     if: always()
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
+      actions: read
     env:
       BASE_REF: ${{ github.event.pull_request.base.ref }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
-      - name: Checkout fixture repository
+      - name: Checkout trusted base-ref policy
+        # Check out the base commit, never the PR head. This working tree is trusted.
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
 
-      - name: Fetch trusted base ref when absent
+      - name: Fetch base ref and head objects without checkout
         run: |
-          if ! git rev-parse --verify --quiet "origin/${BASE_REF}" > /dev/null; then
-            git fetch origin "${BASE_REF}" --depth=1
-          fi
+          # PR_NUMBER comes from the event as an integer. Guard it anyway before it
+          # reaches a ref path, so a malformed value can never inject a fetch refspec.
+          case "${PR_NUMBER}" in
+            ''|*[!0-9]*)
+              echo "pull request number is not numeric; failing closed"
+              exit 1
+              ;;
+          esac
+          # Bring origin/${BASE_REF} for the trusted-ref diff, and the PR head as
+          # objects only. enforce policy reads blob contents with git show and
+          # git ls-tree, which never check out or execute the head, so no PR code runs.
+          git fetch --no-tags origin "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}"
+          git fetch --no-tags origin "refs/pull/${PR_NUMBER}/head"
 
       - name: Checkout trusted usabl engine commit
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -246,14 +266,42 @@ jobs:
         working-directory: .usabl-engine
         run: npm ci && npm run build
 
-      - name: Download Result JSON
+      - name: Resolve the accessibility scan run for this head
+        if: github.event_name == 'pull_request_review'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The scan runs only on pull_request. Find its completed run for this exact
+          # head SHA so the re-check consumes a real Result and never scans head code.
+          # env.HEAD_SHA is read inside jq, never interpolated into the filter string.
+          run_id="$(gh run list --repo "${GITHUB_REPOSITORY}" \
+            --workflow usabl-gate.yml --event pull_request --limit 50 \
+            --json databaseId,headSha,status \
+            --jq '[.[] | select(.headSha == env.HEAD_SHA and .status == "completed")][0].databaseId')"
+          if [ -z "${run_id}" ] || [ "${run_id}" = "null" ]; then
+            echo "no completed accessibility scan for head ${HEAD_SHA}; failing closed"
+            exit 1
+          fi
+          echo "SCAN_RUN_ID=${run_id}" >> "$GITHUB_ENV"
+
+      - name: Download Result JSON from this run
+        if: github.event_name == 'pull_request'
         uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: usabl-result
+
+      - name: Download Result JSON from the scan run
+        if: github.event_name == 'pull_request_review'
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: usabl-result
+          run-id: ${{ env.SCAN_RUN_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Enforce policy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Git refs and CODEOWNERS are the source of truth. Stdin Result cannot skip owners.
+          # Git refs and CODEOWNERS are the source of truth. The Result on stdin is
+          # consumed only for the exit-4 crash short-circuit, never to skip owners.
           node .usabl-engine/dist/cli.js enforce policy --trusted-ref "origin/${BASE_REF}" < usabl-result.json
