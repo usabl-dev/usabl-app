@@ -1,8 +1,36 @@
 import { readFile } from 'node:fs/promises'
 import { describe, expect, it } from 'vitest'
 
+// The engine commit the demo CI is pinned to. This is duplicated from the gate
+// workflow on purpose: the test encodes the approved pin independently, so an
+// unreviewed re-pin of the workflow fails here instead of drifting silently.
+// Update this in lockstep with the workflow's usabl-dev/usabl checkouts.
+const TRUSTED_ENGINE = 'e84b42b67bfd1dcfff2a3cd3e9f0440f4077fcbf'
+
 async function rootFile(path: string): Promise<string> {
   return readFile(path, 'utf8')
+}
+
+// Return the ref pinned by every checkout of the usabl-dev/usabl engine repo.
+// Other checkouts (the fixture's own head and base) are ignored, so this asserts
+// the engine pin specifically, and catches a partial re-pin that updates one
+// checkout but not the other.
+function enginePins(workflow: string): string[] {
+  const lines = workflow.split('\n')
+  const pins: string[] = []
+  lines.forEach((line, index) => {
+    if (!/^\s*repository:\s*usabl-dev\/usabl\s*$/.test(line)) {
+      return
+    }
+    for (let i = index + 1; i < Math.min(index + 6, lines.length); i += 1) {
+      const match = /^\s*ref:\s*(\S+)\s*$/.exec(lines[i] ?? '')
+      if (match) {
+        pins.push(match[1] as string)
+        break
+      }
+    }
+  })
+  return pins
 }
 
 // Return a single job's YAML block so an assertion can target one job instead of
@@ -27,7 +55,9 @@ describe('team demo wiring', () => {
   it('pins CI to the trusted engine and splits accessibility from policy', async () => {
     const workflow = await rootFile('.github/workflows/usabl-gate.yml')
     const codeowners = await rootFile('.github/CODEOWNERS')
-    expect(workflow).toContain('ref: caef8a469cb8def203d03809b33fc787420940fc')
+    const pins = enginePins(workflow)
+    expect(pins.length).toBeGreaterThan(0)
+    expect(pins.every((ref) => ref === TRUSTED_ENGINE)).toBe(true)
     expect(workflow).toContain('npx playwright install --with-deps chromium')
     expect(workflow).toContain('check --ci --trusted-ref')
     expect(workflow).toContain('usabl-policy:')
