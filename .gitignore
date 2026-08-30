@@ -16,6 +16,15 @@ dist-ssr
 storageState*.json
 **/storageState*.json
 
+# Agent and tool working directories (never commit)
+.work/
+.remember/
+
+# Secrets (never commit)
+.env
+*.key
+*.pem
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
