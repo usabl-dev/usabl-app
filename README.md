@@ -285,6 +285,48 @@ main. This keeps `baseline-repaired` available for the next rehearsal.
 Every surface uses the same Result model. The inspector and mid-session command do
 not mint a separate verdict.
 
+In v0.2.0 the Result also reports paid-down floor identities: accepted floor
+barriers that are now resolved. This paid-down count appears in the CLI summary,
+the pull request comment, and the browser overlay. Reporting the count does not
+re-arm the floor. Run `usabl floor prune` to remove those identities so a
+reintroduced barrier gates as new instead of staying carried.
+
+## Adopt usabl in your own repository
+
+The walkthrough above uses this fixture, which is already wired. To adopt usabl in
+your own repository, use the v0.2.0 adoption and lifecycle commands. These
+commands draft, inspect, wire, and report, but only the gate decides a verdict.
+`usabl check` locally, and `usabl enforce` on the CI side, are the only commands
+that mint one.
+
+Run each command from your repository root.
+
+- `usabl install` prepares one integration surface at a time by writing an
+  adoption draft. Pass exactly one target per run: `--overlay`, `--claude`,
+  `--ci`, or `--branch-rule`. It enables nothing on its own; you review and commit
+  the draft yourself. `--branch-rule` is a read-only verify that reports whether
+  the main branch already requires the usabl policy check and writes nothing.
+- `usabl doctor` is a read-only self-check of the integration surfaces. It reports
+  each surface as wired, missing, drifted, or unknown, with one honest next step,
+  and mints no verdict. It always exits 0 when it renders a report, so a missing
+  surface is information, not a failure.
+- `usabl drift routes` compares the routes configured in `usabl.routes.json`
+  against the routes it discovers in your app router. It reads only and mints no
+  verdict. When it cannot parse the router, it refuses with a manual step rather
+  than guessing, so it never reports drift it cannot confirm.
+- `usabl init` drafts a starting policy from your application tree. It does not run
+  the gate and does not write waivers or evidence.
+- `usabl baseline` runs a full scan and drafts the accepted accessibility floor as
+  a reviewable working-tree diff, so existing barriers are recorded and only new
+  barriers gate.
+- `usabl floor prune` re-arms the floor after a full scan. It removes paid-down
+  identities from the floor so a reintroduced barrier gates as new instead of
+  staying carried.
+- `usabl stop-hook` is the stable entry point wired into `.claude/settings.json`.
+  It is the command behind the configured Stop hook you ran earlier. It is a thin
+  reader of the hook input on stdin and always exits 0, so a wedged hook cannot
+  block continuation through an exit code.
+
 ## Fast recovery
 
 If the demo fails, state the missing proof plainly.
