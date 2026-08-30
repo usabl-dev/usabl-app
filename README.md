@@ -323,9 +323,12 @@ Run each command from your repository root.
   identities from the floor so a reintroduced barrier gates as new instead of
   staying carried.
 - `usabl stop-hook` is the stable entry point wired into `.claude/settings.json`.
-  It is the command behind the configured Stop hook you ran earlier. It is a thin
-  reader of the hook input on stdin and always exits 0, so a wedged hook cannot
-  block continuation through an exit code.
+  It is the command behind the configured Stop hook you ran earlier. It runs the
+  gate when the assistant tries to finish and blocks continuation through the Stop
+  hook decision when the gate reports a new barrier, an uncovered change, or a
+  policy change that needs approval, or when a guarded policy file changes during
+  the session. It always exits 0, so a wedged hook fails open with disclosure
+  instead of blocking through an exit code.
 
 ## Fast recovery
 
