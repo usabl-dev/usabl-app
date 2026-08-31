@@ -108,14 +108,17 @@ describe('team demo wiring', () => {
     expect(codeowners).toContain('.github/CODEOWNERS @eparenti')
   })
 
-  it('keeps the Claude mid-session check advisory and the installed Stop hook gating', async () => {
+  it('keeps the Claude on-demand self-check advisory and the installed Stop hook gating', async () => {
     const settings = await rootFile('.claude/settings.json')
     const skill = await rootFile('.claude/skills/usabl-check/SKILL.md')
+    // Collapse the skill file's line wrapping so the sentence assertions check the
+    // contract, not where the Markdown happens to wrap.
+    const skillText = skill.replace(/\s+/g, ' ')
 
     expect(settings).toContain('node node_modules/usabl/dist/stop-hook-runner.js')
     expect(skill).toContain('npx usabl check --self-check')
-    expect(skill).toContain('This is a mid-session check. It is advisory.')
-    expect(skill).toContain('The usabl Stop hook decides whether Claude can finish.')
+    expect(skillText).toContain('This is an on-demand self-check the assistant runs during implementation. It is advisory.')
+    expect(skillText).toContain('The usabl Stop hook decides whether Claude can finish.')
   })
 
   it('documents the complete browser, Claude, pull request, and CI loop', async () => {
@@ -130,10 +133,11 @@ describe('team demo wiring', () => {
     expect(packageJson.scripts['demo:break']).toBe('node scripts/set-demo-source.mjs broken')
     expect(packageJson.scripts['demo:repair']).toBe('node scripts/set-demo-source.mjs repaired')
     expect(config.uiFileGlobs).toContain('src/demo/scenarios.ts')
-    expect(readme).toContain('## Part 3: inspect the browser Result')
-    expect(readme).toContain('## Part 4: show Claude during implementation')
-    expect(readme).toContain('## Part 5: show the pull request block')
-    expect(readme).toContain('## Part 6: repair and verify')
+    expect(readme).toContain('### Inspect the browser Result')
+    expect(readme).toContain('### Run the assistant self-check')
+    expect(readme).toContain('Prove it in a pull request')
+    expect(readme).toContain('### Repair and verify')
+    expect(readme).toContain('CI accessibility check')
     expect(readme).not.toContain('overlay badge')
   })
 })
