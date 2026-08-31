@@ -176,6 +176,10 @@ Claude runs:
 npx usabl check --self-check
 ```
 
+Keep the Part 1 dev server running. `usabl check` scans the changed screens over
+the running fixture at `http://127.0.0.1:5173`. With no server, the check reports
+Not covered instead of the regression.
+
 Expected result:
 
 - The mid-session result says `REGRESSION`.
@@ -296,8 +300,11 @@ reintroduced barrier gates as new instead of staying carried.
 The walkthrough above uses this fixture, which is already wired. To adopt usabl in
 your own repository, use the v0.2.0 adoption and lifecycle commands. These
 commands draft, inspect, wire, and report, but only the gate decides a verdict.
-`usabl check` locally, and `usabl enforce` on the CI side, are the only commands
-that mint one.
+`usabl check` is the only command that mints one. It runs the gate locally, and in
+CI the gate runs through the trusted engine. On the CI side, `usabl enforce` reads
+the Result that `usabl check` produced and returns the CI check status. It does not
+run the gate and does not mint a verdict of its own. Branch protection and
+CODEOWNERS then decide whether that status blocks the merge.
 
 Run each command from your repository root.
 
