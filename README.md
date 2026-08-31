@@ -343,6 +343,7 @@ If the demo fails, state the missing proof plainly.
 
 | Problem | Check | Recovery |
 | --- | --- | --- |
+| Dev server will not start | Port 5173 is already in use | Stop the other process on 5173, then run `npm run dev` again |
 | Inspector is absent | URL does not include `usabl=off`; browser is not webdriver | Reload the fixture and inspect Vite output |
 | Inspector says Idle | Source state file is unchanged | Run `npm run demo:break` and confirm `git diff` |
 | Claude skill is missing | Claude started outside the repository root | Restart Claude from `usabl-app` |
