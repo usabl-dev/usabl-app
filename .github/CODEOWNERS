@@ -1,10 +1,16 @@
-# Policy files. User logins only. Org team entries fail closed in enforce policy.
-usabl.config.json @eparenti
-usabl.routes.json @eparenti
-.usabl-evidence.json @eparenti
-.usabl-waivers.json @eparenti
+# Policy files. Individual logins only: the usabl-dev org has no teams, so an
+# "@usabl-dev/<name>" team entry resolves to nobody. Each owner must have write
+# access to this repo or GitHub ignores the entry.
+usabl.config.json @eparenti @nitin-dhevar @vishsanghishetty
+usabl.routes.json @eparenti @nitin-dhevar @vishsanghishetty
+.usabl-evidence.json @eparenti @nitin-dhevar @vishsanghishetty
+.usabl-waivers.json @eparenti @nitin-dhevar @vishsanghishetty
+
+# usabl.docs.json is a guarded policy file in the engine's trust boundary. Owning
+# it now means the first PR that introduces the docs surface still needs owner review.
+usabl.docs.json @eparenti @nitin-dhevar @vishsanghishetty
 
 # The gate protects itself. The workflow decides the merge and CODEOWNERS decides
 # who can approve policy changes, so a PR that edits either needs an owner review.
-.github/workflows/* @eparenti
-.github/CODEOWNERS @eparenti
+.github/workflows/* @eparenti @nitin-dhevar @vishsanghishetty
+.github/CODEOWNERS @eparenti @nitin-dhevar @vishsanghishetty
