@@ -20,7 +20,7 @@ After the walkthrough, each teammate should be able to explain:
 - What accessibility barrier a person experiences.
 - Which changed screens usabl checked.
 - Why the Result is a regression, verified, not covered, or awaiting approval.
-- Why the browser inspector and Claude mid-session check are advisory.
+- Why the browser inspector and the assistant's `/usabl-check` self-check are advisory.
 - Why the Claude Stop hook and pull request check can block completion.
 - How a verified receipt is tied to the checked source state.
 
@@ -176,9 +176,13 @@ Claude runs:
 npx usabl check --self-check
 ```
 
+Keep the Part 1 dev server running. `usabl check` scans the changed screens over
+the running fixture at `http://127.0.0.1:5173`. With no server, the check reports
+Not covered instead of the regression.
+
 Expected result:
 
-- The mid-session result says `REGRESSION`.
+- The self-check result says `REGRESSION`.
 - It explains the first accessibility finding.
 - It states that the check is advisory and the Stop hook remains the gate.
 - The command exits zero so it can guide work without pretending to approve it.
@@ -282,8 +286,8 @@ main. This keeps `baseline-repaired` available for the next rehearsal.
 | CI accessibility | Pull request changes mapped interface files | Yes | `accessibilityExitCode` from the trusted engine |
 | CI policy | Pull request changes guarded policy files | Yes | CODEOWNERS approval of the current head |
 
-Every surface uses the same Result model. The inspector and mid-session command do
-not mint a separate verdict.
+Every surface uses the same Result model. The inspector and the `/usabl-check`
+self-check do not mint a separate verdict.
 
 In v0.2.0 the Result also reports paid-down floor identities: accepted floor
 barriers that are now resolved. This paid-down count appears in the CLI summary,
@@ -296,8 +300,11 @@ reintroduced barrier gates as new instead of staying carried.
 The walkthrough above uses this fixture, which is already wired. To adopt usabl in
 your own repository, use the v0.2.0 adoption and lifecycle commands. These
 commands draft, inspect, wire, and report, but only the gate decides a verdict.
-`usabl check` locally, and `usabl enforce` on the CI side, are the only commands
-that mint one.
+`usabl check` is the only command that mints one. It runs the gate locally, and in
+CI the gate runs through the trusted engine. On the CI side, `usabl enforce` reads
+the Result that `usabl check` produced and returns the CI check status. It does not
+run the gate and does not mint a verdict of its own. Branch protection and
+CODEOWNERS then decide whether that status blocks the merge.
 
 Run each command from your repository root.
 

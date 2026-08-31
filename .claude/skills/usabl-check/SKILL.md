@@ -13,5 +13,6 @@ Report:
 3. The first finding and suggested repair, when present.
 4. Any missing coverage.
 
-This is a mid-session check. It is advisory. Do not call the work verified from
-this command alone. The usabl Stop hook decides whether Claude can finish.
+This is an on-demand self-check the assistant runs during implementation. It is
+advisory. Do not call the work verified from this command alone. The usabl Stop hook
+decides whether Claude can finish.
