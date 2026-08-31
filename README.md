@@ -1,37 +1,46 @@
-# usabl team demo
+# usabl team fixture
 
-This is the working fixture for the usabl v0.2.0 team demo. It uses a realistic
-PatternFly operations workflow to show accessibility barriers, one usabl Result,
-and the same Result across the browser inspector, Claude, and pull request checks.
+This is the hands-on fixture for learning usabl. It is a small React and
+PatternFly operations app with deliberate accessibility barriers wired in, so you
+can install usabl, run it, and watch the full accessibility proof loop end to end
+on your own machine.
 
-Start with the
-[team orientation](https://usabl-dev.github.io/usabl/team-orientation.html)
-and [How usabl works](https://usabl-dev.github.io/usabl/how-usabl-works.html).
-Then use this page for the live walkthrough.
+This page is written to be the first thing you read. Follow it top to bottom and
+you will go from an empty folder to a working setup, a live accessibility
+regression, and a verified repair. Every command below has been run in this
+order.
 
-Allow 20 minutes for the first run. You do not need to write code to operate the
-browser steps or read the results. Pair with a developer for setup and the Git
-steps if needed.
+Allow about 20 minutes for the first pass. You do not need to write code to
+operate the walkthrough. Pair with a developer for the optional pull request step
+if you like.
 
-## What the team should learn
+## What you will be able to explain afterward
 
-After the walkthrough, each teammate should be able to explain:
+- The accessibility barrier a person actually experiences.
+- Which changed screens usabl checked, and why.
+- Why a Result is a regression, verified, not covered, or awaiting approval.
+- Why the browser inspector and the assistant `/usabl-check` self-check are
+  advisory, while the Claude Stop hook and the pull request check can block.
+- How a verified receipt is tied to the exact source state that was checked.
 
-- What accessibility barrier a person experiences.
-- Which changed screens usabl checked.
-- Why the Result is a regression, verified, not covered, or awaiting approval.
-- Why the browser inspector and the assistant's `/usabl-check` self-check are advisory.
-- Why the Claude Stop hook and pull request check can block completion.
-- How a verified receipt is tied to the checked source state.
+## Prerequisites
 
-## Repository layout
+- Node.js 22 and npm. Check with `node -v` and `npm -v`.
+- Git.
+- About 150 MB of disk for the headless browser the scanner drives.
+- Optional, for the pull request step only: the GitHub CLI (`gh`) and access to
+  the `usabl-dev` organization.
 
-Clone the private repositories as siblings:
+## Step 1: Install
+
+usabl is not published to a package registry yet, so the fixture uses the engine
+from a sibling folder through `"usabl": "file:../usabl"`. Clone both repositories
+next to each other:
 
 ```text
-<workspace>/
-  usabl/
-  usabl-app/
+<your-workspace>/
+  usabl/        the engine
+  usabl-app/    this fixture
 ```
 
 ```bash
@@ -39,126 +48,140 @@ git clone https://github.com/usabl-dev/usabl.git
 git clone https://github.com/usabl-dev/usabl-app.git
 ```
 
-The fixture uses `"usabl": "file:../usabl"` until the package is published.
-
-## Prepare once
-
-Use Node.js 22 and npm.
+Build the engine and install the browser the scanner uses. Playwright downloads
+Chromium into a shared cache, so this only happens once per machine:
 
 ```bash
 cd usabl
 npm ci
 npm run build
 npx playwright install chromium
-
-cd ../usabl-app
-npm ci
-npm test
-npm run build
 ```
 
-Confirm the fixture starts from a clean, repaired source state:
+Install the fixture:
 
 ```bash
-npm run demo:status
-git status --short
+cd ../usabl-app
+npm ci
 ```
 
-Expected source state:
+That is the whole install. If `npx playwright install chromium` reports missing
+system libraries on Linux, run `npx playwright install --with-deps chromium`
+instead.
 
-```text
-demo source: repaired (baseline-repaired)
+## Step 2: Confirm your setup
+
+Run these from `usabl-app`. They should all succeed before you continue.
+
+```bash
+npm run demo:status   # expect: demo source: repaired (baseline-repaired)
+npm test              # unit tests for the fixture and its wiring
+npm run typecheck     # tsc --noEmit
+npm run lint          # oxlint
+npm run build         # tsc -b && vite build
 ```
 
-Stop if Git reports unrelated changes. Do not mix personal work into the demo
-branch.
+`demo:status` reports the tracked source state. A fresh clone starts at
+`repaired (baseline-repaired)`. If it shows anything else, someone left the
+fixture mid-walkthrough. Reset it to the clean baseline:
 
-## Understand the three states
+```bash
+git checkout -- src/demo/scenarios.ts
+```
 
-The Demo controls region shows two separate concepts.
-
-- **Current source** renders the tracked source state. This is what usabl checks.
-- **Broken teaching preview** lets anyone experience the barriers without editing
-  source. It does not prove a regression.
-- **Repaired teaching preview** lets anyone compare the repaired behavior. It does
-  not mint a receipt.
-
-The visible **Tracked source** label shows the source mode and rehearsal label.
-Only a changed current source can drive the proof loop.
-
-## Part 1: experience the barriers
-
-Start the fixture from `usabl-app`:
+## Step 3: Start the fixture
 
 ```bash
 npm run dev
 ```
 
-Open
-`http://127.0.0.1:5173/deployments?scenario=deployment-workflow&preview=broken`.
+Open `http://127.0.0.1:5173`.
 
-Use only the keyboard when possible.
+The fixture, the `usabl.config.json` file, and the scanner all use the IPv4
+address `127.0.0.1`. The dev server binds `0.0.0.0` so that address always
+resolves, both for your browser and for the headless browser the scanner drives.
+Leave this server running for the rest of the walkthrough. The scanner cannot
+reach the screens without it, and the check then reports Not covered instead of a
+real Result.
+
+### Two ideas to keep separate
+
+The Demo controls region on the page mixes two concepts on purpose, so learn to
+tell them apart:
+
+- **Current source** renders the tracked source state. This is what usabl checks.
+- **A teaching preview** (the broken or repaired preview) lets anyone experience
+  the barriers or the fix through a query parameter. It never changes the tracked
+  source, so it never drives a Result.
+
+The visible **Tracked source** label always shows the real source mode and its
+rehearsal label. Only a change to the current source can drive the proof loop.
+
+## Step 4: Run the accessibility proof loop
+
+This is the core of the fixture. You will experience a barrier, introduce it as a
+real source change, and then watch usabl catch it in the browser, in the
+assistant, and finally clear it on repair.
+
+You can run every command in this step on whatever branch you cloned. The loop
+reads your working tree, not a branch. The optional pull request step later is the
+only part that needs its own branch.
+
+### Experience the barriers
+
+Open
+`http://127.0.0.1:5173/deployments?scenario=deployment-workflow&preview=broken`
+and use only the keyboard where possible:
 
 1. Move through the three **View details** actions. A screen reader announces the
    same name for each row, so the destination is unclear.
-2. Open **Actions for policy-worker**. Expanded state is not announced, and focus
-   stays on the toggle instead of moving into the menu.
+2. Open **Actions for policy-worker**. The expanded state is not announced, and
+   focus stays on the toggle instead of moving into the menu.
 3. Select **Start deployment**. The visual message appears outside a live region,
    so assistive technology may not announce it.
 4. Move to the button marked only with `×`. It has no accessible name.
 5. Notice the two toolbars. In the broken state they have no distinct accessible
    names.
-6. Select **Cluster details dialog** in Demo controls. Open the dialog, then press
-   `Escape`. Focus does not return to **View cluster details**.
+6. In Demo controls, open the **Cluster details dialog**, then press `Escape`.
+   Focus does not return to **View cluster details**.
 
-Now select **Repaired teaching preview** and repeat the same tasks. The accessible
-names, menu state and focus, notification, toolbar names, clear button name, and
-dialog focus lifecycle should be repaired.
+Now switch the preview to **Repaired** and repeat the same tasks. The names, menu
+state and focus, notification, toolbar names, clear button name, and dialog focus
+should all behave correctly. Return the preview to **Current source** before
+continuing.
 
-Return Preview to **Current source** before continuing.
+### Break the tracked source
 
-## Part 2: make a real broken source change
-
-Open a second terminal in `usabl-app`:
+Introduce the barriers as a real source change:
 
 ```bash
-git switch -c demo/team-accessibility-loop
 npm run demo:break
 git diff -- src/demo/scenarios.ts
+npm run demo:status   # expect: broken (team-demo-broken)
 ```
 
-Expected tracked source label:
+The dev server reloads the changed source. These barriers now come from the
+tracked source, not from a preview query parameter.
 
-```text
-broken (team-demo-broken)
-```
+### Inspect the browser Result
 
-The dev server reloads the changed source. Repeat one deployment task and the
-cluster dialog task. These barriers now come from the changed source, not a query
-preview.
+Open the **usabl** launcher in the lower right corner of the fixture. The
+inspector should show:
 
-## Part 3: inspect the browser Result
-
-Open the **usabl** launcher in the lower right corner of the fixture.
-
-The accessibility inspector should show:
-
-- **Regression** status.
-- The affected Deployments and Clusters screens.
-- Findings grouped by screen.
-- The user impact, reason, suggested repair, rule, provider, severity, status,
-  and confidence for a selected finding.
+- A **Regression** status.
+- The affected **Deployments** and **Clusters** screens.
+- Findings grouped by screen, with user impact, reason, suggested repair, rule,
+  provider, severity, status, and confidence for a selected finding.
 - No verified receipt while regressions remain.
 
-The inspector is advisory. It displays the gate-owned Result but cannot decide a
-different verdict or allow the work to finish.
+The inspector is advisory. It displays the gate-owned Result, but it cannot decide
+a different verdict or let the work finish. If it says Idle, confirm that
+`src/demo/scenarios.ts` is changed and that the preview is set to Current source,
+then reload the page once.
 
-If the launcher says Idle, confirm that `src/demo/scenarios.ts` is changed and
-that Preview is set to **Current source**. Save the file or reload the page once.
+### Run the assistant self-check
 
-## Part 4: show Claude during implementation
-
-Start Claude Code from the `usabl-app` root:
+From the `usabl-app` folder, start Claude Code:
 
 ```bash
 claude
@@ -170,202 +193,179 @@ Run the project skill:
 /usabl-check
 ```
 
-Claude runs:
+Claude runs `npx usabl check --self-check`, which scans the changed screens over
+the running fixture at `http://127.0.0.1:5173`. Expect:
 
-```bash
-npx usabl check --self-check
-```
+- The verdict `REGRESSION` with the gating findings.
+- An explanation of the first accessibility finding.
+- A clear statement that the self-check is advisory and the Stop hook is the gate.
+- Exit code zero, so it can guide the work without pretending to approve it.
 
-Keep the Part 1 dev server running. `usabl check` scans the changed screens over
-the running fixture at `http://127.0.0.1:5173`. With no server, the check reports
-Not covered instead of the regression.
+### Watch the Stop hook block the finish
 
-Expected result:
-
-- The self-check result says `REGRESSION`.
-- It explains the first accessibility finding.
-- It states that the check is advisory and the Stop hook remains the gate.
-- The command exits zero so it can guide work without pretending to approve it.
-
-Then ask Claude to finish without repairing the source:
+Ask Claude to finish without repairing the source:
 
 ```text
 We are done. Finish this task.
 ```
 
-The configured Stop hook runs automatically. Expected behavior:
+The configured Stop hook runs automatically. It is wired in
+`.claude/settings.json` and runs `node node_modules/usabl/dist/stop-hook-runner.js`.
+Expect:
 
 - Claude is blocked from stopping once.
 - The hook returns the regression reason and repair guidance.
-- A continuation can work on the accessibility repair without entering a hook
-  loop.
+- A continuation can work on the repair without entering a hook loop.
 
-Do not use `npx usabl bypass` in the normal demo. It is an explicit, visible
+Do not use `npx usabl bypass` during the walkthrough. It is a visible, one-time
 escape path, not a pass.
 
-## Part 5: show the pull request block
+### Repair and verify
 
-Commit the broken source state:
+Repair the source and check again:
 
 ```bash
+npm run demo:repair
+npm run demo:status   # expect: repaired (team-demo-repaired)
+```
+
+Repeat one deployment task and the cluster dialog task in the browser, then run
+`/usabl-check` again. Expect:
+
+- The verdict `VERIFIED` with no active regression findings.
+- A receipt bound to the current source tree, the policy hash, and the runner
+  version.
+
+Ask Claude to finish again. The Stop hook now allows completion, because the
+stored receipt matches the current source state.
+
+### Reset to the clean baseline
+
+`demo:repair` restores the repaired behavior, but it leaves the rehearsal label
+`team-demo-repaired`, so `git status` still shows `src/demo/scenarios.ts` as
+changed. Return the fixture to its clean baseline so the next person starts fresh:
+
+```bash
+git checkout -- src/demo/scenarios.ts
+npm run demo:status   # expect: repaired (baseline-repaired)
+```
+
+## Step 5: Prove it in a pull request (optional)
+
+This step shows the same Result blocking a merge in CI. It needs its own branch.
+Use `git switch -C`, which creates the branch or resets it if you have run this
+before, so a repeat rehearsal never fails with "branch already exists":
+
+```bash
+git switch -C demo/team-accessibility-loop
+npm run demo:break
 git add src/demo/scenarios.ts
 git commit -m "test: expose accessibility regressions"
 git push -u origin demo/team-accessibility-loop
 gh pr create --base main --title "test: rehearse accessibility proof loop"
 ```
 
-Open the pull request in GitHub.
-
-Expected result:
+Open the pull request. Expect:
 
 - The `gate-comment` check fails on the accessibility exit.
-- A sticky usabl comment shows Regression and the same accessibility findings.
-- The comment and check come from an immutable trusted engine copy.
-- The failed check prevents a normal merge.
+- A sticky usabl comment shows Regression and the same findings.
+- The comment and check come from a trusted, immutable engine checkout, so PR head
+  code cannot alter the verdict.
 
-Do not merge this rehearsal pull request while it is broken.
-
-## Part 6: repair and verify
-
-Back in the Claude session, ask:
-
-```text
-Repair the controlled accessibility source state. Then run /usabl-check and
-explain what changed.
-```
-
-Claude can run:
+Now repair and push again:
 
 ```bash
 npm run demo:repair
-```
-
-Expected tracked source label:
-
-```text
-repaired (team-demo-repaired)
-```
-
-Repeat the browser tasks. Confirm that names, menu state and focus, notification,
-toolbar labels, clear button name, and dialog focus are repaired.
-
-Run `/usabl-check` again. Expected result:
-
-- `VERIFIED`
-- No active regression findings
-- A receipt bound to the current source tree, policy hash, and runner version
-
-Ask Claude to finish again. The Stop hook should now allow completion because the
-stored receipt matches the current source state.
-
-Commit and push the repair:
-
-```bash
-git add src/demo/scenarios.ts
-git commit -m "fix: repair demo accessibility behavior"
+git commit -am "fix: repair demo accessibility behavior"
 git push
 ```
 
-Expected pull request result:
+Expect the sticky comment to update to Verified and the `gate-comment` and
+`usabl-policy` checks to pass. Close the pull request after the session. Do not
+merge it, so `baseline-repaired` stays available for the next rehearsal. Then
+return to your main branch and reset the working tree:
 
-- The same sticky comment updates to Verified.
-- The `gate-comment` and `usabl-policy` required checks pass.
-- The receipt describes the repaired head commit.
-
-Close the rehearsal pull request after the team session. Do not merge it into
-main. This keeps `baseline-repaired` available for the next rehearsal.
+```bash
+git switch main
+git checkout -- src/demo/scenarios.ts
+```
 
 ## What each surface does
 
-| Surface | When it runs | Can block | What to show |
+Every surface renders the same Result model. Only the gate mints a verdict. The
+inspector and the `/usabl-check` self-check report it but never decide a different
+one.
+
+| Surface | When it runs | Can block | What it shows |
 | --- | --- | --- | --- |
 | Browser inspector | Dev server load and source refresh | No | Findings, coverage, repair guidance, receipt |
-| Claude `/usabl-check` | Operator invokes it during work | No | Advisory Result before Claude tries to finish |
-| Claude Stop hook | Claude tries to stop | Yes | Regression block, then verified allow |
-| Pull request comment | Trusted GitHub workflow runs | Yes, through its checks | Sticky Result for the exact PR head |
-| CI accessibility | Pull request changes mapped interface files | Yes | `accessibilityExitCode` from the trusted engine |
-| CI policy | Pull request changes guarded policy files | Yes | CODEOWNERS approval of the current head |
-
-Every surface uses the same Result model. The inspector and the `/usabl-check`
-self-check do not mint a separate verdict.
+| `/usabl-check` self-check | You invoke it during work | No | Advisory Result before the assistant tries to finish |
+| Claude Stop hook | The assistant tries to stop | Yes | Regression block, then verified allow |
+| Pull request comment | Trusted GitHub workflow runs | Through its checks | Sticky Result for the exact PR head |
+| CI accessibility check | A PR changes mapped interface files | Yes | The accessibility exit code from the trusted engine |
+| CI policy check | A PR changes guarded policy files | Yes | CODEOWNERS approval of the current head |
 
 In v0.2.0 the Result also reports paid-down floor identities: accepted floor
-barriers that are now resolved. This paid-down count appears in the CLI summary,
-the pull request comment, and the browser overlay. Reporting the count does not
-re-arm the floor. Run `usabl floor prune` to remove those identities so a
-reintroduced barrier gates as new instead of staying carried.
+barriers that are now resolved. This count appears in the CLI summary, the pull
+request comment, and the browser inspector. Reporting it does not re-arm the
+floor. Run `usabl floor prune` to remove those identities, so a reintroduced
+barrier gates as new instead of staying carried.
+
+## Troubleshooting
+
+State the missing proof plainly. Never call an absent, failed, Idle, or Not
+covered check verified.
+
+| Problem | Likely cause | What to do |
+| --- | --- | --- |
+| Dev server will not start | Port 5173 is already in use | Stop the other process on 5173, then run `npm run dev` again |
+| `demo:status` is not `baseline-repaired` | A previous run left the fixture changed | Run `git checkout -- src/demo/scenarios.ts` |
+| Working tree still changed after repair | `demo:repair` uses the `team-demo-repaired` label | Run `git checkout -- src/demo/scenarios.ts` to reach `baseline-repaired` |
+| Result is Not covered | The dev server is not running, or a mapped route did not load | Start `npm run dev`, keep it running, and reload the fixture |
+| Inspector says Idle | The tracked source is unchanged | Run `npm run demo:break` and confirm `git diff` |
+| Inspector is absent | The URL includes `usabl=off`, or the browser is a webdriver | Reload the fixture and check the Vite output |
+| `/usabl-check` skill is missing | Claude started outside the repository root | Restart `claude` from `usabl-app` |
+| Stop hook does not run | The package is not installed, or settings are not trusted | Run `npm ci`, then restart Claude |
+| `git switch -c` fails with "branch already exists" | You have run the pull request step before | Use `git switch -C` to create or reset the branch |
+| Chromium fails to launch on Linux | Missing system libraries | Run `npx playwright install --with-deps chromium` |
+| PR check cannot clone the engine | A repository secret is missing | Ask a maintainer to restore the read-only checkout token |
 
 ## Adopt usabl in your own repository
 
 The walkthrough above uses this fixture, which is already wired. To adopt usabl in
-your own repository, use the v0.2.0 adoption and lifecycle commands. These
-commands draft, inspect, wire, and report, but only the gate decides a verdict.
-`usabl check` is the only command that mints one. It runs the gate locally, and in
-CI the gate runs through the trusted engine. On the CI side, `usabl enforce` reads
-the Result that `usabl check` produced and returns the CI check status. It does not
-run the gate and does not mint a verdict of its own. Branch protection and
-CODEOWNERS then decide whether that status blocks the merge.
+your own repository, use the v0.2.0 adoption and lifecycle commands. They draft,
+inspect, wire, and report. Only `usabl check` mints a verdict: it runs the gate
+locally, and in CI the gate runs through the trusted engine. `usabl enforce` reads
+the Result that `usabl check` produced and returns the CI status. It does not run
+the gate. Branch protection and CODEOWNERS then decide whether that status blocks
+the merge.
 
 Run each command from your repository root.
 
 - `usabl install` prepares one integration surface at a time by writing an
   adoption draft. Pass exactly one target per run: `--overlay`, `--claude`,
   `--ci`, or `--branch-rule`. It enables nothing on its own; you review and commit
-  the draft yourself. `--branch-rule` is a read-only verify that reports whether
-  the main branch already requires the usabl policy check and writes nothing.
+  the draft. `--branch-rule` is a read-only check that reports whether the main
+  branch already requires the usabl policy check, and writes nothing.
 - `usabl doctor` is a read-only self-check of the integration surfaces. It reports
   each surface as wired, missing, drifted, or unknown, with one honest next step,
-  and mints no verdict. It always exits 0 when it renders a report, so a missing
-  surface is information, not a failure.
-- `usabl drift routes` compares the routes configured in `usabl.routes.json`
-  against the routes it discovers in your app router. It reads only and mints no
-  verdict. When it cannot parse the router, it refuses with a manual step rather
-  than guessing, so it never reports drift it cannot confirm.
-- `usabl init` drafts a starting policy from your application tree. It does not run
-  the gate and does not write waivers or evidence.
+  and mints no verdict. It exits 0 when it renders a report, so a missing surface
+  is information, not a failure.
+- `usabl drift routes` compares the routes in `usabl.routes.json` against the
+  routes it discovers in your app router. It reads only. When it cannot parse the
+  router, it refuses with a manual step rather than guessing.
+- `usabl init` drafts a starting policy from your application tree. It runs no gate
+  and writes no waivers or evidence.
 - `usabl baseline` runs a full scan and drafts the accepted accessibility floor as
   a reviewable working-tree diff, so existing barriers are recorded and only new
   barriers gate.
 - `usabl floor prune` re-arms the floor after a full scan. It removes paid-down
-  identities from the floor so a reintroduced barrier gates as new instead of
-  staying carried.
+  identities so a reintroduced barrier gates as new instead of staying carried.
 - `usabl stop-hook` is the stable entry point wired into `.claude/settings.json`.
-  It is the command behind the configured Stop hook you ran earlier. It runs the
-  gate when the assistant tries to finish and blocks continuation through the Stop
-  hook decision when the gate reports a new barrier, an uncovered change, or a
-  policy change that needs approval, or when a guarded policy file changes during
-  the session. It always exits 0, so a wedged hook fails open with disclosure
-  instead of blocking through an exit code.
-
-## Fast recovery
-
-If the demo fails, state the missing proof plainly.
-
-| Problem | Check | Recovery |
-| --- | --- | --- |
-| Dev server will not start | Port 5173 is already in use | Stop the other process on 5173, then run `npm run dev` again |
-| Inspector is absent | URL does not include `usabl=off`; browser is not webdriver | Reload the fixture and inspect Vite output |
-| Inspector says Idle | Source state file is unchanged | Run `npm run demo:break` and confirm `git diff` |
-| Claude skill is missing | Claude started outside the repository root | Restart Claude from `usabl-app` |
-| Stop hook does not run | `.claude/settings.json` is trusted and package is installed | Run `npm ci`, then restart Claude |
-| Result is Not covered | Browser or mapped route did not run | Keep the Not covered result visible and inspect the named gap |
-| PR check cannot clone usabl | Repository secret is missing | Ask a maintainer to restore the read-only checkout token |
-
-Never call an absent, failed, Idle, or Not covered check verified.
-
-## Verify this fixture
-
-```bash
-npm test
-npm run typecheck
-npm run lint
-npm run build
-npm audit --omit=dev
-```
-
-The fixture is version `0.2.0`. CI pins the engine to the trusted commit in
-`.github/workflows/usabl-gate.yml`. Local installs still use
-`"usabl": "file:../usabl"` until `usabl@0.2.0` is published.
+  It runs the gate when the assistant tries to finish and blocks continuation when
+  the gate reports a new barrier, an uncovered change, or a policy change that
+  needs approval. It exits 0, so a wedged hook fails open with disclosure instead
+  of blocking through an exit code.
 
 ## Real application validation
 
@@ -374,16 +374,28 @@ real-application measurement target:
 
 - Application: https://fleet-insights.apps.engineering.openshift.org/
 - Harness: `../usabl/scripts/measure-fleet-insights.ts`
-- Command: `npm run measure:fleet-insights` from the `usabl` repository
+- Command: `npm run measure:fleet-insights`, run from the `usabl` repository
 
 Fleet Insights measurement requires an authorized local browser session. Never
 commit storage state, cookies, tokens, screenshots with private data, or captured
 session files. Report measurement results separately from the controlled fixture
 proof.
 
+## Learn more
+
+- [Team orientation](https://usabl-dev.github.io/usabl/team-orientation.html):
+  the product in one read.
+- [How usabl works](https://usabl-dev.github.io/usabl/how-usabl-works.html): the
+  Result model, the trust boundary, and the product surfaces.
+
 ## Feedback
 
 Use the
 [usabl feedback form](https://github.com/usabl-dev/usabl/issues/new?template=feedback.yml).
-Include the surface, exact verdict, expected verdict, steps, URL, engine commit,
-app commit, and whether the result matched the accessibility behavior.
+Include the surface, the exact verdict, the expected verdict, the steps, the URL,
+the engine commit, the app commit, and whether the Result matched the
+accessibility behavior.
+
+This fixture is version `0.2.0`. CI pins the engine to the trusted commit in
+`.github/workflows/usabl-gate.yml`. Local installs use `"usabl": "file:../usabl"`
+until `usabl@0.2.0` is published.
