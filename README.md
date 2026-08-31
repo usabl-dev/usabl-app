@@ -217,6 +217,21 @@ Expect:
 - The hook returns the regression reason and repair guidance.
 - A continuation can work on the repair without entering a hook loop.
 
+If Claude finishes without being blocked, the hook did not fire. Claude Code loads
+hooks when a session starts and runs only trusted ones, so restart `claude` from
+`usabl-app` and run `/hooks` to confirm the Stop hook is listed and enabled. To test
+the engine on its own, with the dev server running and the source broken, run:
+
+```bash
+echo '{"stop_hook_active":false}' | node node_modules/usabl/dist/stop-hook-runner.js
+```
+
+It prints a JSON object containing `"decision":"block"` when the engine blocks. If it
+does, the engine is correct and the failure is in Claude Code's hook trust or a
+stale session, so restart `claude` and check `/hooks`. If it prints nothing or an
+error, rebuild the engine with `cd ../usabl && npm ci && npm run build` and confirm
+the dev server is running.
+
 Do not use `npx usabl bypass` during the walkthrough. It is a visible, one-time
 escape path, not a pass.
 
@@ -325,7 +340,7 @@ covered check verified.
 | Inspector says Idle | The tracked source is unchanged | Run `npm run demo:break` and confirm `git diff` |
 | Inspector is absent | The URL includes `usabl=off`, or the browser is a webdriver | Reload the fixture and check the Vite output |
 | `/usabl-check` skill is missing | Claude started outside the repository root | Restart `claude` from `usabl-app` |
-| Stop hook does not run | The package is not installed, or settings are not trusted | Run `npm ci`, then restart Claude |
+| Stop hook does not run | Claude Code has not loaded or trusted the hook, or the package is not installed | Restart `claude` from `usabl-app`, run `/hooks` to confirm the Stop hook is enabled, and run `npm ci` if the package is missing |
 | `git switch -c` fails with "branch already exists" | You have run the pull request step before | Use `git switch -C` to create or reset the branch |
 | Chromium fails to launch on Linux | Missing system libraries | Run `npx playwright install --with-deps chromium` |
 | PR check cannot clone the engine | A repository secret is missing | Ask a maintainer to restore the read-only checkout token |
