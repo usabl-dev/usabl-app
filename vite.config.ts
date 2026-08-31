@@ -8,13 +8,15 @@ import { usablVitePluginFromConfig } from 'usabl/vite'
  */
 export default defineConfig({
   server: {
-    // Bind all interfaces (0.0.0.0). Vite's default `localhost` resolves to IPv6 (::1)
-    // on Node 17 and later, which the scanner cannot reach at http://127.0.0.1:5173, so
-    // the check would report Not covered instead of the expected result. Binding all
-    // interfaces keeps 127.0.0.1 reachable for the in-container scanner and also exposes
-    // the fixture to the host when usabl runs inside a container. strictPort fails loudly
-    // rather than drifting to another port and leaving the check pointed at an empty address.
-    host: true,
+    // Bind IPv4 on all interfaces (0.0.0.0). usabl.config.json and the runbook target
+    // http://127.0.0.1:5173, and the scanner opens that IPv4 address in a headless
+    // browser. Vite's default `localhost`, and `host: true`, listen on IPv6 (::) only;
+    // that dual-stacks on some systems but not others, so the scanner's IPv4 request is
+    // refused and the check reports Not covered. Binding 0.0.0.0 always serves 127.0.0.1
+    // for the scanner and the browser, and also exposes the fixture on the LAN address.
+    // strictPort fails loudly rather than drifting to another port and leaving the check
+    // pointed at an empty address.
+    host: '0.0.0.0',
     port: 5173,
     strictPort: true,
   },
