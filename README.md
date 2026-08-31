@@ -326,6 +326,22 @@ request comment, and the browser inspector. Reporting it does not re-arm the
 floor. Run `usabl floor prune` to remove those identities, so a reintroduced
 barrier gates as new instead of staying carried.
 
+## Surface test plans
+
+The walkthrough above runs all four surfaces together in one pass. When you want to
+test a single surface in isolation, or hand a checklist to a teammate, use the
+per-surface test plans. Each one lists reproducible cases with steps and expected
+results, and points to the matching automated tests.
+
+- [Surface test plans overview](docs/test-plans/README.md): shared setup, the verdict
+  and exit-code reference, and the cross-surface consistency check.
+- [CLI](docs/test-plans/cli.md): the gate, `usabl check`.
+- [Assistant](docs/test-plans/assistant.md): the Claude Stop hook and the
+  `/usabl-check` self-check.
+- [Pull request and CI](docs/test-plans/pr-and-ci.md): the `gate-comment` and
+  `usabl-policy` checks.
+- [Overlay](docs/test-plans/overlay.md): the advisory dev-server inspector.
+
 ## Troubleshooting
 
 State the missing proof plainly. Never call an absent, failed, Idle, or Not
