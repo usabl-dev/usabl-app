@@ -108,14 +108,17 @@ describe('team demo wiring', () => {
     expect(codeowners).toContain('.github/CODEOWNERS @eparenti')
   })
 
-  it('keeps the Claude mid-session check advisory and the installed Stop hook gating', async () => {
+  it('keeps the Claude on-demand self-check advisory and the installed Stop hook gating', async () => {
     const settings = await rootFile('.claude/settings.json')
     const skill = await rootFile('.claude/skills/usabl-check/SKILL.md')
+    // Collapse the skill file's line wrapping so the sentence assertions check the
+    // contract, not where the Markdown happens to wrap.
+    const skillText = skill.replace(/\s+/g, ' ')
 
     expect(settings).toContain('node node_modules/usabl/dist/stop-hook-runner.js')
     expect(skill).toContain('npx usabl check --self-check')
-    expect(skill).toContain('This is a mid-session check. It is advisory.')
-    expect(skill).toContain('The usabl Stop hook decides whether Claude can finish.')
+    expect(skillText).toContain('This is an on-demand self-check the assistant runs during implementation. It is advisory.')
+    expect(skillText).toContain('The usabl Stop hook decides whether Claude can finish.')
   })
 
   it('documents the complete browser, Claude, pull request, and CI loop', async () => {
