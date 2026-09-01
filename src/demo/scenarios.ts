@@ -1,7 +1,7 @@
 export type SourceMode = 'broken' | 'repaired'
 
-export const CURRENT_SOURCE_MODE: SourceMode = 'broken'
-export const CURRENT_SOURCE_LABEL = 'team-demo-broken'
+export const CURRENT_SOURCE_MODE: SourceMode = 'repaired'
+export const CURRENT_SOURCE_LABEL = 'team-demo-repaired'
 
 export type DemoScenarioId =
   | 'deployment-workflow'
