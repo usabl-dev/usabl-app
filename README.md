@@ -355,7 +355,7 @@ covered check verified.
 | Result is Not covered | The dev server is not running, or a mapped route did not load | Start `npm run dev`, keep it running, and reload the fixture |
 | Inspector says Idle | The tracked source is unchanged | Run `npm run demo:break` and confirm `git diff` |
 | Inspector is absent | The URL includes `usabl=off`, or the browser is a webdriver | Reload the fixture and check the Vite output |
-| `/usabl-check` skill is missing | Claude started outside the repository root | Restart `claude` from `usabl-app` |
+| `/usabl-check` skill is missing | Claude started outside the repository root, or the skill was never installed | Restart `claude` from `usabl-app`; in your own repository, run `usabl install --claude-skill` to write it |
 | Stop hook does not run | Claude Code has not loaded or trusted the hook, or the package is not installed | Restart `claude` from `usabl-app`, run `/hooks` to confirm the Stop hook is enabled, and run `npm ci` if the package is missing |
 | `git switch -c` fails with "branch already exists" | You have run the pull request step before | Use `git switch -C` to create or reset the branch |
 | Chromium fails to launch on Linux | Missing system libraries | Run `npx playwright install --with-deps chromium` |
@@ -375,9 +375,12 @@ Run each command from your repository root.
 
 - `usabl install` prepares one integration surface at a time by writing an
   adoption draft. Pass exactly one target per run: `--overlay`, `--claude`,
-  `--ci`, or `--branch-rule`. It enables nothing on its own; you review and commit
-  the draft. `--branch-rule` is a read-only check that reports whether the main
-  branch already requires the usabl policy check, and writes nothing.
+  `--claude-skill`, `--ci`, `--docs-ci`, or `--branch-rule`. It enables nothing on
+  its own; you review and commit the draft. `--claude` wires the Stop hook, while
+  `--claude-skill` writes the on-demand `/usabl-check` skill (the same skill this
+  fixture ships) so the assistant can run the advisory self-check during work.
+  `--branch-rule` is a read-only check that reports whether the main branch already
+  requires the usabl policy check, and writes nothing.
 - `usabl doctor` is a read-only self-check of the integration surfaces. It reports
   each surface as wired, missing, drifted, or unknown, with one honest next step,
   and mints no verdict. It exits 0 when it renders a report, so a missing surface
