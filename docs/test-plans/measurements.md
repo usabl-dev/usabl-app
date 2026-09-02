@@ -185,3 +185,43 @@ repository.
 Worth recording for its own sake: the harness reported these screens as inconclusive
 with the reason attached, rather than reporting them as stable. A run that measures
 nothing and says so is the outcome the disclosure path exists to produce.
+
+---
+
+## 2026-09-02: element identity is stable across repeated scans
+
+The property the whole differential ratchet rests on. If the same unchanged page
+produces different element keys on two scans, the engine reads one barrier as both
+fixed and new, and every verdict built on that is noise.
+
+### What was measured
+
+Same application, lab, and session as the entries above. Three screens, scanned three
+times each, comparing the set of element keys the differential engine would key on.
+
+### Engine state
+
+Engine carried the fix for unstable generated identity, which neutralizes values React
+produces per mount. The readiness budget was raised locally to 60000 ms and the settle
+period to 20000 ms, because this application needs 25.7 seconds to become ready and the
+engine allows 15. Those two values let the scan reach a rendered page. They do not
+change what is compared once it gets there.
+
+### Result
+
+| Screen | Round 1 | Round 2 | Round 3 | Unstable keys |
+| --- | --- | --- | --- | --- |
+| `/overview` | 69 | 69 | 69 | 0 |
+| `/access/users` | 53 | 53 | 53 | 0 |
+| `/content/collections` | 58 | 58 | 58 | 0 |
+
+Drift rate 0 on every screen. Not one key differed across three scans.
+
+`/access/users` is the screen that mattered. It drifted before the fix, because React
+generates a fresh id on every mount and that value reached the element key, so a clean
+tree could report a regression. It is now exactly stable.
+
+The first attempt at this measurement produced no result at all. It lost seven of its
+nine screen rounds to the readiness timeout recorded in the entry above. Separating the
+readiness problem from the identity problem is what made this number obtainable, which
+is worth remembering the next time a measurement comes back empty.
