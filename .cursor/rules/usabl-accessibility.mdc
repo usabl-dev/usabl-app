@@ -1,6 +1,6 @@
 ---
 description: Run usabl accessibility self-checks while editing UI and before claiming work is done
-globs: src/**/*.{tsx,jsx,css}
+globs: src/App.tsx,src/index.css,src/pages/*.tsx,src/components/DemoControls.tsx,src/components/DemoModal.tsx,src/components/PageHeader.tsx,src/components/StatusBadge.tsx,src/demo/scenarios.ts,src/lib/variant.ts
 alwaysApply: false
 ---
 
