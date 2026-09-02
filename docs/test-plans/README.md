@@ -9,6 +9,7 @@ this fixture, so every case is reproducible on a clean clone.
 - [Pull request and CI test plan](pr-and-ci.md): the `gate-comment` and `usabl-policy` checks.
 - [Overlay test plan](overlay.md): the advisory dev-server inspector.
 - [Brownfield onboarding (Fleet Insights)](brownfield-fleet-insights.md): the adoption path on a real Red Hat PatternFly app. Does not replace the fixture plans.
+- [Measurements](measurements.md): timings, counts, and other numbers from real runs. A record of what we measured, not a plan to follow.
 
 The full operational walkthrough is the [team demo runbook](../../README.md). Read it
 first if you have never run the loop. These plans assume you can already start the
