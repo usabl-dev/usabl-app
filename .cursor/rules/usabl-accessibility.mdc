@@ -1,0 +1,15 @@
+---
+description: Run usabl accessibility self-checks while editing UI and before claiming work is done
+globs: src/**/*.{tsx,jsx,css}
+alwaysApply: false
+---
+
+# usabl accessibility workflow
+
+When changing user interface code:
+
+- After a meaningful UI change, run `/usabl-check` or `npx usabl check --self-check` from the repository root.
+- Treat usabl findings as the source of truth for machine-checkable barriers.
+- Explain verdicts honestly: `verified`, `regression`, `not_covered`, or `approval_required`.
+- Do not call work verified from the self-check alone. The gate (`usabl check` / CI) decides proof.
+- Prefer fixing source over query-parameter previews or disabling checks.

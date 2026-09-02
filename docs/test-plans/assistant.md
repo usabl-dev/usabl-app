@@ -1,8 +1,10 @@
 # Assistant test plan
 
 Two assistant surfaces share one engine. The `/usabl-check` self-check is advisory
-and lets Claude see the Result mid-task. The Stop hook is the gate for the assistant:
-it runs when Claude tries to finish and blocks an incomplete accessibility change.
+and lets the assistant see the Result mid-task. In Claude Code it is a project skill;
+in Cursor it is a slash command at `.cursor/commands/usabl-check.md` (install with
+`usabl install --cursor`). The Stop hook is the gate for Claude Code: it runs when
+Claude tries to finish and blocks an incomplete accessibility change.
 
 Read the [shared setup and verdict reference](README.md) first. The Stop hook is
 wired in `.claude/settings.json` as `node node_modules/usabl/dist/stop-hook-runner.js`
