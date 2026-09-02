@@ -130,3 +130,58 @@ The walk returned nothing on every screen before the fix, because its budget was
 anchored when the provider was constructed rather than when each screen was walked.
 The other two layers are unchanged, which is what confirms the fix added a layer
 without disturbing the others.
+
+---
+
+## 2026-09-02: how long a real screen takes to become ready
+
+The first measurement of readiness itself, rather than of what the scan found. It
+exists because a scan of a page that has not arrived yet returns a small, plausible,
+and completely wrong answer.
+
+### What was measured
+
+Same application, lab, and session as the entry above. Screen `/overview`, signed in
+as `admin`. Navigation was timed to network idle, then the wait continued until the
+total element count stopped changing, sampled four times at 500 ms.
+
+### Engine state
+
+Measured from the `fix/ready-waits-for-render` working tree with uncommitted changes,
+using its `waitForRendered` function directly. The engine's readiness budget,
+`READY_TIMEOUT_MS`, is 15000 ms.
+
+### Result
+
+| Phase | Time |
+| --- | --- |
+| Navigation to network idle | 12.4 s |
+| Network idle to a DOM that stops changing | 13.3 s |
+| Total to ready | 25.7 s |
+
+The finished page holds 1319 elements and 124 focusable controls. This is an ordinary
+dashboard, not an unusually heavy page.
+
+The headline is the second row. More than half the wait happens after the network goes
+quiet, so network idle is not a usable readiness signal for this application. It is
+also the signal the engine used until now.
+
+### What this costs today
+
+A three round identity stability run across three screens, taken at the 15000 ms
+budget, lost seven of its nine screen rounds:
+
+| Screen | Rounds that failed |
+| --- | --- |
+| `/overview` | 1 and 3 |
+| `/access/users` | 1, 2 and 3 |
+| `/content/collections` | 1, 2 and 3 |
+
+Every failure was `waitForLoadState: Timeout 15000ms exceeded`. Earlier runs on these
+same screens completed, so the budget was never comfortably enough. It sat close enough
+to the line that lab load decided the outcome. Tracked as issue 141 in the engine
+repository.
+
+Worth recording for its own sake: the harness reported these screens as inconclusive
+with the reason attached, rather than reporting them as stable. A run that measures
+nothing and says so is the outcome the disclosure path exists to produce.
