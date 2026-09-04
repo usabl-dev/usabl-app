@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           repository: usabl-dev/usabl
-          ref: 51a9ce3ffb816dc2789efc8a968b86fbc3ecbe6e
+          ref: e9096217358cc43d1471db9e0b277ca12a7522f9
           path: .usabl-engine
           token: ${{ secrets.USABL_ENGINE_CHECKOUT_TOKEN }}
           persist-credentials: false
@@ -250,7 +250,7 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           repository: usabl-dev/usabl
-          ref: 51a9ce3ffb816dc2789efc8a968b86fbc3ecbe6e
+          ref: e9096217358cc43d1471db9e0b277ca12a7522f9
           path: .usabl-engine
           token: ${{ secrets.USABL_ENGINE_CHECKOUT_TOKEN }}
           persist-credentials: false
