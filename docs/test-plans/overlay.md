@@ -58,7 +58,7 @@ reads Idle. A clean tree has no change to check, so there is no claim.
 
 **Expected:** The JSON shows `"verdict":"regression"` and `"exitCode":1`, while
 `"displayExitCode":0` because the overlay is advisory. The inspector shows Regression,
-the affected Deployments and Clusters screens, eight findings with user impact and
+the affected Deployments and Clusters screens, nine findings with user impact and
 repair guidance, and no receipt while regressions remain.
 
 - [ ] Pass

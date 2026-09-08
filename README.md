@@ -295,8 +295,9 @@ git commit -am "fix: repair demo accessibility behavior"
 git push
 ```
 
-Expect the sticky comment to update to Verified and the `gate-comment` and
-`usabl-policy` checks to pass. Close the pull request after the session. Do not
+Expect the sticky comment to update to Verified and the `gate-comment`,
+`usabl-policy`, and `usabl-required` checks to pass. Close the pull request after the
+session. Do not
 merge it, so `baseline-repaired` stays available for the next rehearsal. Then
 return to your main branch and reset the working tree:
 
@@ -338,8 +339,8 @@ results, and points to the matching automated tests.
 - [CLI](docs/test-plans/cli.md): the gate, `usabl check`.
 - [Assistant](docs/test-plans/assistant.md): the Claude Stop hook and the
   `/usabl-check` self-check.
-- [Pull request and CI](docs/test-plans/pr-and-ci.md): the `gate-comment` and
-  `usabl-policy` checks.
+- [Pull request and CI](docs/test-plans/pr-and-ci.md): the `gate-comment`,
+  `usabl-policy`, and `usabl-required` checks.
 - [Overlay](docs/test-plans/overlay.md): the advisory dev-server inspector.
 
 ## Troubleshooting

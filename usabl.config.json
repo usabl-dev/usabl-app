@@ -16,10 +16,10 @@
     "wideBlastGlobs": ["src/App.tsx", "src/main.tsx", "src/**/*.css", "index.html", "vite.config.ts"]
   },
   "surfaces": [
-    { "id": "overview", "url": "http://127.0.0.1:5173/", "files": ["src/App.tsx", "src/index.css", "src/pages/Overview.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts"] },
-    { "id": "deployments", "url": "http://127.0.0.1:5173/deployments", "files": ["src/App.tsx", "src/index.css", "src/pages/Deployments.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts"] },
-    { "id": "clusters", "url": "http://127.0.0.1:5173/clusters", "files": ["src/App.tsx", "src/index.css", "src/pages/Clusters.tsx", "src/components/DemoControls.tsx", "src/components/DemoModal.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts", "src/lib/variant.ts"] },
-    { "id": "settings", "url": "http://127.0.0.1:5173/settings", "files": ["src/App.tsx", "src/index.css", "src/pages/Settings.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/demo/scenarios.ts"] }
+    { "id": "overview", "url": "http://127.0.0.1:5173/", "overridesDiscoveredRoute": true, "files": ["src/App.tsx", "src/index.css", "src/pages/Overview.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts"] },
+    { "id": "deployments", "url": "http://127.0.0.1:5173/deployments", "overridesDiscoveredRoute": true, "files": ["src/App.tsx", "src/index.css", "src/pages/Deployments.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts"] },
+    { "id": "clusters", "url": "http://127.0.0.1:5173/clusters", "overridesDiscoveredRoute": true, "files": ["src/App.tsx", "src/index.css", "src/pages/Clusters.tsx", "src/components/DemoControls.tsx", "src/components/DemoModal.tsx", "src/components/PageHeader.tsx", "src/components/StatusBadge.tsx", "src/demo/scenarios.ts", "src/lib/variant.ts"] },
+    { "id": "settings", "url": "http://127.0.0.1:5173/settings", "overridesDiscoveredRoute": true, "files": ["src/App.tsx", "src/index.css", "src/pages/Settings.tsx", "src/components/DemoControls.tsx", "src/components/PageHeader.tsx", "src/demo/scenarios.ts"] }
   ],
   "guardedPaths": ["usabl.config.json", "usabl.routes.json", ".usabl-evidence.json", ".usabl-waivers.json", ".github/workflows", ".github/CODEOWNERS"]
 }

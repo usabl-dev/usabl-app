@@ -225,3 +225,73 @@ The first attempt at this measurement produced no result at all. It lost seven o
 nine screen rounds to the readiness timeout recorded in the entry above. Separating the
 readiness problem from the identity problem is what made this number obtainable, which
 is worth remembering the next time a measurement comes back empty.
+
+---
+
+## 2026-09-08: the five fixture scenarios against the freeze engine
+
+The contest freeze measurement. Every scenario in the shared setup was run once
+against the frozen engine so the numbers the plans quote are numbers someone actually
+produced, not numbers carried forward.
+
+### What was measured
+
+This fixture, at the commit that bumps the engine pin. Node 22, Chromium driven by the
+engine, dev server on `http://127.0.0.1:5173`. Each scenario was produced with the
+documented command, measured, and reset before the next one.
+
+### Engine state
+
+Engine pin moved from `e9096217358cc43d1471db9e0b277ca12a7522f9` to
+`3ef810540203c46d8a70c01b22239dca7452f11e`, which is the freeze commit. Clean working
+tree except where the scenario itself requires a change. No local engine edits.
+
+### Result
+
+| Scenario | Verdict | Exit | Findings | Affected screens |
+| --- | --- | --- | --- | --- |
+| Idle | `null` | 0 | 0 | none, no UI file changed |
+| Regression | `regression` | 1 | 9 | deployments 7, clusters 2 |
+| Verified | `verified` | 0 | 0, receipt minted | deployments, clusters |
+| Not covered | `not_covered` | 3 | 0, 2 gaps | deployments, clusters |
+| Approval required | `approval_required` | 2 | 0, 1 guarded path | none |
+
+### The count that changed
+
+The regression scenario reports **nine** blocking findings. The plans quoted eight, and
+that eight is what this entry supersedes.
+
+| | Quoted before | Measured against the freeze commit |
+| --- | --- | --- |
+| Regression findings | 8 | 9 |
+
+Stated precisely, because the difference matters: the nine was measured here, twice,
+once against the pre-freeze branch and once against `3ef8105`. The eight was not
+re-measured. It is the number the plans carried from the era of the old pin, and no run
+in this session reproduced it. So this is a corrected quote, not a measured
+before-and-after of two engines.
+
+The nine break down as seven on Deployments and two on Clusters, every one of them new,
+`fail` confidence, and gating:
+
+| Rule | Layer | Screen |
+| --- | --- | --- |
+| `button-name` | axe | deployments |
+| `pf-icon-button-name` | pf | deployments |
+| `pf-kebab-expanded-state` | pf | deployments |
+| `pf-row-action-name-unique` | pf | deployments |
+| `pf-toolbar-labeled-when-repeated` | pf | deployments (twice) |
+| `keyboard-walk-unnamed-interactive` | walk | deployments |
+| `pf-focus-into-dialog` | pf | clusters |
+| `pf-modal-focus-return` | pf | clusters |
+
+`pf-toolbar-labeled-when-repeated` firing twice on one screen is what makes the total
+nine rather than eight distinct rules.
+
+### Gate topology at the freeze
+
+The gate workflow moved from two jobs to the three the engine's installer generates.
+`usabl-required` is now the check to require. This matters for what the pull request
+scenario shows: on a pure accessibility regression no guarded path diverges, so
+`usabl-policy` is green and only `gate-comment` and `usabl-required` are red. The plans
+previously said `usabl-policy` went red, which it does not.
