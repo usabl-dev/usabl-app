@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 // workflow on purpose: the test encodes the approved pin independently, so an
 // unreviewed re-pin of the workflow fails here instead of drifting silently.
 // Update this in lockstep with the workflow's usabl-dev/usabl checkouts.
-const TRUSTED_ENGINE = '51a9ce3ffb816dc2789efc8a968b86fbc3ecbe6e'
+const TRUSTED_ENGINE = '3ef810540203c46d8a70c01b22239dca7452f11e'
 
 async function rootFile(path: string): Promise<string> {
   return readFile(path, 'utf8')
@@ -31,6 +31,17 @@ function enginePins(workflow: string): string[] {
     }
   })
   return pins
+}
+
+// Return only the owner rules from a CODEOWNERS file, dropping comments and blank
+// lines. The rules are what GitHub acts on. A comment may legitimately quote a
+// pattern it is warning against, so asserting over the raw text reads a warning as
+// the very entry it warns about.
+function ownerRules(codeowners: string): string {
+  return codeowners
+    .split('\n')
+    .filter((line) => line.trim() !== '' && !line.trim().startsWith('#'))
+    .join('\n')
 }
 
 // Return a single job's YAML block so an assertion can target one job instead of
@@ -72,7 +83,7 @@ describe('team demo wiring', () => {
     expect(codeowners).toContain('@eparenti')
     expect(codeowners).toContain('usabl.config.json')
     expect(codeowners).toContain('.usabl-evidence.json')
-    expect(codeowners).not.toContain('@usabl-dev')
+    expect(ownerRules(codeowners)).not.toContain('@usabl-dev')
   })
 
   it('runs the head-executing scan only on pull_request and re-checks policy without executing head code', async () => {

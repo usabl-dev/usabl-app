@@ -45,7 +45,7 @@ was no interface change to check. It does not claim verified.
 2. `npm run demo:status` shows `broken (team-demo-broken)`.
 3. Run `npx usabl check; echo "exit=$?"`.
 
-**Expected:** Verdict `regression`, `exit=1`, eight gating findings across the
+**Expected:** Verdict `regression`, `exit=1`, nine gating findings across the
 Deployments and Clusters screens. Each finding prints as a what, why, and fix line,
 not a raw dump. No receipt is minted.
 
