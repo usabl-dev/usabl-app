@@ -6,7 +6,7 @@ this fixture, so every case is reproducible on a clean clone.
 
 - [CLI test plan](cli.md): the gate, `usabl check`. The only surface that mints a verdict.
 - [Assistant test plan](assistant.md): the Claude Stop hook and the `/usabl-check` self-check.
-- [Pull request and CI test plan](pr-and-ci.md): the `gate-comment` and `usabl-policy` checks.
+- [Pull request and CI test plan](pr-and-ci.md): the `gate-comment`, `usabl-policy`, and `usabl-required` checks.
 - [Overlay test plan](overlay.md): the advisory dev-server inspector.
 - [Brownfield onboarding (Fleet Insights)](brownfield-fleet-insights.md): the adoption path on a real Red Hat PatternFly app. Does not replace the fixture plans.
 - [Measurements](measurements.md): timings, counts, and other numbers from real runs. A record of what we measured, not a plan to follow.
@@ -82,7 +82,7 @@ the surface, then reset before the next case.
 | Scenario | Produce it | Expected verdict | Reset |
 | --- | --- | --- | --- |
 | Idle | Clean baseline tree, no change | `null` (idle), exit 0 | Already clean |
-| Regression | `npm run demo:break` | `regression`, exit 1, eight findings | `git checkout -- src/demo/scenarios.ts` |
+| Regression | `npm run demo:break` | `regression`, exit 1, nine findings | `git checkout -- src/demo/scenarios.ts` |
 | Verified | `npm run demo:break` then `npm run demo:repair` | `verified`, exit 0, receipt minted | `git checkout -- src/demo/scenarios.ts` |
 | Not covered | Break the source, then stop the dev server, or touch an interface file the route map does not know | `not_covered`, exit 3 | Restart the server, `git checkout` the file |
 | Approval required | Edit a guarded policy file, for example `usabl.routes.json` | `approval_required`, exit 2 | `git checkout -- usabl.routes.json` |
@@ -105,7 +105,7 @@ broken and the dev server running.
 | Overlay | `curl -s http://127.0.0.1:5173/__usabl/result` | `"verdict":"regression"` |
 | Self-check | `/usabl-check` in Claude | `REGRESSION`, advisory, exit 0 |
 | Stop hook | `echo '{"stop_hook_active":false}' \| node node_modules/usabl/dist/stop-hook-runner.js` | stdout contains `"decision":"block"` |
-| Pull request | Push the break to a branch and open a PR | `gate-comment` fails, `usabl-policy` red |
+| Pull request | Push the break to a branch and open a PR | `gate-comment` fails and `usabl-required` is red; `usabl-policy` stays green |
 | Repair | `npm run demo:repair` | Every surface flips to `verified` or allow |
 
 If any surface disagrees while the tree is identical, that is a defect. Capture the

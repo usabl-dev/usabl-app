@@ -1,15 +1,24 @@
 # Pull request and CI test plan
 
 The pull request surface runs the same gate from a trusted engine checkout that pull
-request head code cannot alter. It has two jobs, defined in
+request head code cannot alter. It has three jobs, defined in
 `.github/workflows/usabl-gate.yml`:
 
 - **`gate-comment`** runs on every pull request. It starts the fixture, runs
   `usabl check --ci --trusted-ref origin/<base-ref>`, posts a sticky comment with the
-  Result, and enforces the accessibility exit code.
+  Result, and enforces the accessibility exit code. It executes pull request head
+  code, so it is fenced to the `pull_request` event and cannot run on a review.
 - **`usabl-policy`** decides whether a change to a guarded policy file has the
   required code-owner approval of the current head. It reads policy and CODEOWNERS
-  from the trusted base ref and never checks out pull request head.
+  from the trusted base ref and never checks out pull request head. It also publishes
+  the accessibility verdict for this head as an output, read from the Result artifact.
+- **`usabl-required`** is the required status check. It is the only job that sees both
+  the accessibility verdict and the policy verdict, so it is the one that decides.
+
+Require `usabl-required`, not the other two. `gate-comment` cannot run on a review
+event, and `usabl-policy` returns success whenever no guarded path diverged, which
+says nothing about accessibility. Requiring either one on its own lets an
+accessibility regression merge.
 
 Read the [shared setup and verdict reference](README.md) first. This plan needs the
 GitHub CLI (`gh`) and push access to a fork or branch of `usabl-app`.
@@ -35,7 +44,7 @@ exact head commit.
 
 - Shared setup complete.
 - You can push a branch to `usabl-app` and open a pull request against `main`.
-- Branch protection makes `usabl-policy` a required check (for TC-CI-06).
+- Branch protection makes `usabl-required` a required check (for TC-CI-06).
 
 ## Test cases
 
@@ -49,10 +58,11 @@ exact head commit.
 5. `gh pr create --base main --title "test: rehearse accessibility proof loop"`
 6. Open the pull request and watch the checks.
 
-**Expected:** The `gate-comment` check fails on the accessibility exit code. A sticky
-usabl comment shows `Regression` with the same eight findings the other surfaces
-reported. The comment carries a marker so later pushes update it in place rather than
-posting a new one.
+**Expected:** The `gate-comment` check fails on the accessibility exit code and
+`usabl-required` is red. `usabl-policy` stays green, because no guarded path diverged,
+which is why it is not the check to require. A sticky usabl comment shows `Regression`
+with the same nine findings the other surfaces reported. The comment carries a marker
+so later pushes update it in place rather than posting a new one.
 
 - [ ] Pass
 
@@ -63,8 +73,8 @@ posting a new one.
 2. `git commit -am "fix: repair demo accessibility behavior"`
 3. `git push`
 
-**Expected:** The sticky comment updates to `Verified` and shows a receipt. Both
-`gate-comment` and `usabl-policy` pass. Close the pull request without merging so the
+**Expected:** The sticky comment updates to `Verified` and shows a receipt. All three
+checks pass, `usabl-required` included. Close the pull request without merging so the
 `baseline-repaired` state stays available for the next rehearsal.
 
 - [ ] Pass
@@ -115,12 +125,14 @@ SHA.
 **Objective:** The check has to be required for it to protect anything.
 
 **Steps:**
-1. With `usabl-policy` set as a required status check on `main`, open the regression
+1. With `usabl-required` set as a required status check on `main`, open the regression
    pull request from TC-CI-01.
 2. Attempt to merge.
 
-**Expected:** GitHub blocks the merge until `usabl-policy` passes. This is the
-difference between a check that reports and a gate that enforces.
+**Expected:** GitHub blocks the merge until `usabl-required` passes. This is the
+difference between a check that reports and a gate that enforces. Requiring
+`usabl-policy` here instead would let this merge, because the regression touches no
+guarded path.
 
 - [ ] Pass
 
