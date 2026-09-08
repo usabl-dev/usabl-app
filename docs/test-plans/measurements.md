@@ -243,8 +243,13 @@ documented command, measured, and reset before the next one.
 ### Engine state
 
 Engine pin moved from `e9096217358cc43d1471db9e0b277ca12a7522f9` to
-`3ef810540203c46d8a70c01b22239dca7452f11e`, which is the freeze commit. Clean working
+`e3ef958266727382f99030420942abf23db38751`, which is the freeze commit. Clean working
 tree except where the scenario itself requires a change. No local engine edits.
+
+The numbers below were produced against `3ef810540203c46d8a70c01b22239dca7452f11e`.
+The freeze commit is a documentation-only merge on top of it, so the engine code the
+two carry is identical and the measurements stand for both. They were not re-run
+against `e3ef958`.
 
 ### Result
 

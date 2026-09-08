@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 // workflow on purpose: the test encodes the approved pin independently, so an
 // unreviewed re-pin of the workflow fails here instead of drifting silently.
 // Update this in lockstep with the workflow's usabl-dev/usabl checkouts.
-const TRUSTED_ENGINE = '3ef810540203c46d8a70c01b22239dca7452f11e'
+const TRUSTED_ENGINE = 'e3ef958266727382f99030420942abf23db38751'
 
 async function rootFile(path: string): Promise<string> {
   return readFile(path, 'utf8')
