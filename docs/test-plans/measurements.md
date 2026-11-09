@@ -25,11 +25,13 @@ First measurement of the engine against an application it was not built for.
 
 ### What was measured
 
-`ansible/ansible-ui` at `devel`, commit `2c605554c`. A PatternFly 6.3.1 React
-monorepo, served locally by its own Vite dev server and proxied to an Ansible
-Automation Platform 2.6 classroom lab (controller 4.7.8) over an SSH tunnel.
-Authenticated as `admin`. Eight screens, chosen from routes discovered in the
-running application rather than guessed.
+A large PatternFly 6.3.1 React application, a monorepo, served locally
+by its own Vite dev server against a test backend. Signed in as an administrator.
+Eight screens, one dashboard and seven list pages, chosen from routes discovered in
+the running application rather than guessed.
+
+The application and its screens are not named in this file. The usabl maintainers
+keep the named record privately. The numbers are unchanged.
 
 ### Engine state
 
@@ -45,14 +47,14 @@ This is the number that matters for whether a CI gate is viable on an app this s
 
 | Screen | Time | Drafts |
 | --- | --- | --- |
-| `/overview` | 16.8 s | 79 |
-| `/access/organizations` | 15.3 s | 59 |
-| `/access/users` | 17.0 s | 67 |
-| `/access/teams` | 10.0 s | 36 |
-| `/execution/infrastructure/inventories` | 17.3 s | 72 |
-| `/execution/infrastructure/hosts` | 16.5 s | 65 |
-| `/execution/infrastructure/credentials` | 17.6 s | 72 |
-| `/content/collections` | 23.4 s | 113 |
+| Dashboard | 16.8 s | 79 |
+| List 1 | 15.3 s | 59 |
+| List 2 | 17.0 s | 67 |
+| List 3 | 10.0 s | 36 |
+| List 4 | 17.3 s | 72 |
+| List 5 | 16.5 s | 65 |
+| List 6 | 17.6 s | 72 |
+| List 7 | 23.4 s | 113 |
 | **Total** | **134 s** | **563** |
 
 Roughly 17 seconds per screen. The gate only scans surfaces a change touched, so a
@@ -141,8 +143,8 @@ and completely wrong answer.
 
 ### What was measured
 
-Same application, lab, and session as the entry above. Screen `/overview`, signed in
-as `admin`. Navigation was timed to network idle, then the wait continued until the
+Same application, backend, and session as the entry above. The dashboard screen,
+signed in as an administrator. Navigation was timed to network idle, then the wait continued until the
 total element count stopped changing, sampled four times at 500 ms.
 
 ### Engine state
@@ -173,13 +175,13 @@ budget, lost seven of its nine screen rounds:
 
 | Screen | Rounds that failed |
 | --- | --- |
-| `/overview` | 1 and 3 |
-| `/access/users` | 1, 2 and 3 |
-| `/content/collections` | 1, 2 and 3 |
+| Dashboard | 1 and 3 |
+| List 2 | 1, 2 and 3 |
+| List 7 | 1, 2 and 3 |
 
 Every failure was `waitForLoadState: Timeout 15000ms exceeded`. Earlier runs on these
 same screens completed, so the budget was never comfortably enough. It sat close enough
-to the line that lab load decided the outcome. Tracked as issue 141 in the engine
+to the line that backend load decided the outcome. Tracked as issue 141 in the engine
 repository.
 
 Worth recording for its own sake: the harness reported these screens as inconclusive
@@ -196,7 +198,7 @@ fixed and new, and every verdict built on that is noise.
 
 ### What was measured
 
-Same application, lab, and session as the entries above. Three screens, scanned three
+Same application, backend, and session as the entries above. Three screens, scanned three
 times each, comparing the set of element keys the differential engine would key on.
 
 ### Engine state
@@ -211,13 +213,13 @@ change what is compared once it gets there.
 
 | Screen | Round 1 | Round 2 | Round 3 | Unstable keys |
 | --- | --- | --- | --- | --- |
-| `/overview` | 69 | 69 | 69 | 0 |
-| `/access/users` | 53 | 53 | 53 | 0 |
-| `/content/collections` | 58 | 58 | 58 | 0 |
+| Dashboard | 69 | 69 | 69 | 0 |
+| List 2 | 53 | 53 | 53 | 0 |
+| List 7 | 58 | 58 | 58 | 0 |
 
 Drift rate 0 on every screen. Not one key differed across three scans.
 
-`/access/users` is the screen that mattered. It drifted before the fix, because React
+List 2 is the screen that mattered. It drifted before the fix, because React
 generates a fresh id on every mount and that value reached the element key, so a clean
 tree could report a regression. It is now exactly stable.
 
@@ -230,7 +232,7 @@ is worth remembering the next time a measurement comes back empty.
 
 ## 2026-09-08: the five fixture scenarios against the freeze engine
 
-The contest freeze measurement. Every scenario in the shared setup was run once
+The freeze measurement. Every scenario in the shared setup was run once
 against the frozen engine so the numbers the plans quote are numbers someone actually
 produced, not numbers carried forward.
 
