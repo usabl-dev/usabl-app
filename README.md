@@ -404,17 +404,18 @@ Run each command from your repository root.
 
 ## Real application validation
 
-The fixture proves the controlled product loop. Fleet Insights is the separate
-real-application measurement target:
+The fixture proves the controlled product loop. Measuring a real application is a
+separate step, run with the engine's measurement harness against an application
+you are authorized to scan:
 
-- Application: https://fleet-insights.apps.engineering.openshift.org/
 - Harness: `../usabl/scripts/measure-fleet-insights.ts`
 - Command: `npm run measure:fleet-insights`, run from the `usabl` repository
+- Test plan: [brownfield onboarding](docs/test-plans/brownfield-onboarding.md)
 
-Fleet Insights measurement requires an authorized local browser session. Never
-commit storage state, cookies, tokens, screenshots with private data, or captured
-session files. Report measurement results separately from the controlled fixture
-proof.
+A measurement of a signed-in application requires an authorized local browser
+session. Never commit storage state, cookies, tokens, screenshots with private
+data, or captured session files. Report measurement results separately from the
+controlled fixture proof.
 
 ## Learn more
 

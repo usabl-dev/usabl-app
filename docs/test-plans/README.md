@@ -8,7 +8,7 @@ this fixture, so every case is reproducible on a clean clone.
 - [Assistant test plan](assistant.md): the Claude Stop hook and the `/usabl-check` self-check.
 - [Pull request and CI test plan](pr-and-ci.md): the `gate-comment`, `usabl-policy`, and `usabl-required` checks.
 - [Overlay test plan](overlay.md): the advisory dev-server inspector.
-- [Brownfield onboarding (Fleet Insights)](brownfield-fleet-insights.md): the adoption path on a real Red Hat PatternFly app. Does not replace the fixture plans.
+- [Brownfield onboarding](brownfield-onboarding.md): the adoption path on a real PatternFly application that already exists. Does not replace the fixture plans.
 - [Measurements](measurements.md): timings, counts, and other numbers from real runs. A record of what we measured, not a plan to follow.
 
 The full operational walkthrough is the [team demo runbook](../../README.md). Read it

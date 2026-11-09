@@ -1,8 +1,8 @@
-# Brownfield onboarding test plan (Fleet Insights)
+# Brownfield onboarding test plan
 
 The four surface plans in this folder prove usabl on the fixture. This plan is the
-brownfield path against a real Red Hat PatternFly app: Fleet Insights
-(`https://fleet-insights.apps.engineering.openshift.org/`).
+brownfield path: usabl on a real PatternFly application that already exists and that
+your team can run locally. It calls that application "the app".
 
 Read the [shared setup](README.md) and
 [brownfield onboarding](https://github.com/usabl-dev/usabl/blob/main/docs/adoption-model.md#brownfield-onboarding-step-by-step)
@@ -11,8 +11,8 @@ first. File friction with the
 
 ## What this is and is not
 
-The deployed dashboard is the product we want to show. `usabl init` and `usabl check`
-need a local git repo and a running dev server, not only a URL. If you only have the
+`usabl init` and `usabl check` need a local git repo and a running dev server, not
+only the URL of a deployed site. If you only have the
 deployed site, stop after TC-BF-00 and say so. Do not pretend a live URL is a clone.
 
 This plan does not replace the fixture plans. Run those on `usabl-app` first so you
@@ -30,7 +30,7 @@ already know the four verdicts.
 
 - Engine built as a sibling (`../usabl`), Chromium installed.
 - Node 22.
-- Access to a Fleet Insights source checkout you can run locally. Record the repo
+- Access to a source checkout of the app that you can run locally. Record the repo
   URL and the command that starts the app.
 - A note of the local URL (host, port). Do not assume `127.0.0.1:5173`.
 
@@ -38,11 +38,11 @@ already know the four verdicts.
 
 ### TC-BF-00: Can we actually run it?
 
-**Objective:** Confirm Fleet Insights is a local app usabl can drive, not only a
-deployed dashboard.
+**Objective:** Confirm the app is a local app usabl can drive, not only a
+deployed site.
 
 **Steps:**
-1. Clone or locate the Fleet Insights repo.
+1. Clone or locate the app's repo.
 2. Install and start its dev server.
 3. Open the local URL in a browser and confirm a PatternFly screen renders.
 
@@ -56,7 +56,7 @@ be `not_covered`. Record that as a blocker, not a pass.
 ### TC-BF-01: Init does not clobber, drafts are reviewable
 
 **Steps:**
-1. From the Fleet Insights repo, link the local engine the same way the fixture
+1. From the app's repo, link the local engine the same way the fixture
    does (`"usabl": "file:../usabl"` or `npm pack` + install).
 2. `npx usabl init`
 3. Read `usabl.config.json` and `usabl.routes.json`.
@@ -75,7 +75,7 @@ the fixture's Clusters/Deployments map. Log every screen `init` missed.
 ([H1](https://github.com/usabl-dev/usabl/issues/105)).
 
 **Steps:**
-1. Start the Fleet Insights server.
+1. Start the app's dev server.
 2. Touch one interface file (a comment is enough).
 3. `npx usabl check; echo "exit=$?"`
 4. Record wall-clock time from `init` through this first check.
@@ -115,7 +115,7 @@ a typical UI change no longer returns `not_covered` for "file not in any route".
 
 **Expected:** The three answers are obvious from the CLI (or overlay) text. False
 positives go in the feedback form. This is the trust metric, not a WCAG completeness
-audit of Fleet Insights.
+audit of the app.
 
 - [ ] Pass
 - [ ] False positives:
@@ -129,7 +129,7 @@ audit of Fleet Insights.
 
 **Expected:** Baseline refuses if other guarded files are dirty. After the floor is
 accepted, carried findings do not turn the verdict to `regression`. A new barrier
-still does. Do not merge the floor into Fleet Insights production unless the owners
+still does. Do not merge the floor into the app's main branch unless the owners
 want that. A local commit on a throwaway branch is enough to prove the loop.
 
 - [ ] Pass
@@ -172,8 +172,8 @@ Use one row per moment you had to guess, re-read the docs, or wait.
 
 ## Reset
 
-Do not leave policy files, a floor, or overlay wiring on a shared Fleet Insights
-branch unless the team asked for it. Revert with git, or keep the work on a
+Do not leave policy files, a floor, or overlay wiring on a shared branch of the
+app unless the team asked for it. Revert with git, or keep the work on a
 personal branch.
 
 Close with the feedback form for every confusing verdict or false block.
